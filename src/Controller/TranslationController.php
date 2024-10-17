@@ -44,9 +44,9 @@ class TranslationController extends AbstractController
             return $this->redirectToRoute('translation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('translation/new.html.twig', [
+        return $this->render('translation/new.html.twig', [
             'translation' => $translation,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -70,9 +70,9 @@ class TranslationController extends AbstractController
             return $this->redirectToRoute('translation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('translation/edit.html.twig', [
+        return $this->render('translation/edit.html.twig', [
             'translation' => $translation,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 

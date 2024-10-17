@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-3">
+        {% if is_granted('ROLE_STAFF') %}
+            <a class="btn btn-success btn-sm" href="{{ path('business_contacts_new') }}">New</a>
+            <a class="btn btn-outline-primary btn-sm" href="{{ path('business_contacts_import') }}">Import from
+                CSV</a>
+            <a href="{{ asset('administration/import_export/business_contacts/business-contacts-import-template.csv') }}">(Template)</a>
+        {% endif %}
+    </div>
+
+    <div class="col-5">
+    </div>
+    <div class="col-2">
+        {% if app.user %}
+            {% if is_granted('ROLE_STAFF') %}
+                <a class="btn btn-outline-success btn-sm" href="{{ path('business_contacts_new') }}">Add</a>
+            {% else %}
+                <a class="btn btn-outline-success btn-sm" href="{{ path('business_contacts_new') }}">Suggestion</a>
+            {% endif %}
+            <a class="btn btn-outline-primary btn-sm" href="{{ path('business_contacts_export') }}">Export to CSV</a>
+        {% endif %}
+        {% if is_granted('ROLE_STAFF') %}
+            <a target="_blank" class="btn btn-outline-secondary btn-sm" href="{{ path('referrals_index') }}"> User
+                Log</a>
+        {% endif %}
+    </div>
+</div>
+<br>

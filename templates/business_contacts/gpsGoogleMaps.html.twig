@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{{ app.request.server.get('GOOGLE_MAP_API') }}
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <iframe src="https://maps.google.com/maps?q={{ latitude }},{{ longitude }} &hl=es;z=14&amp;output=embed"
+                    width="700" height="700"  style="border:0"></iframe>
+        </div>
+    </div>
+
+{% endblock %}

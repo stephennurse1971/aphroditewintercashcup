@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Business Categories{% endblock %}
+
+{% block body %}
+    <h1 style="color: red">Business Categories</h1>
+
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Type</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for business_type in business_types %}
+            <tr>
+                <td>{{ business_type.businessCategory }}</td>
+                <td>{{ business_type.businessType }}</td>
+                <td><a class="btn btn-outline-danger btn-sm" href="{{ path('business_types_edit', {'id': business_type.id}) }}">Edit</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-success btn-sm" href="{{ path('business_types_new') }}">New</a>
+{% endblock %}
+
+{% block datatable %}
+    <script>
+        $(document).ready(function () {
+            $('.table').DataTable({
+                'pageLength': 100,
+                "order": [[0, 'asc']],
+                "paging": false,
+                "searching": false,
+                "bInfo": false
+            });
+        });
+    </script>
+{% endblock datatable %}

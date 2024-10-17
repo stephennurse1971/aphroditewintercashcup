@@ -51,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $lastName;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean")
      */
     private $emailVerified;
 
@@ -179,7 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->emailVerified;
     }
 
-    public function setEmailVerified(?bool $emailVerified): self
+    public function setEmailVerified(bool $emailVerified): self
     {
         $this->emailVerified = $emailVerified;
 

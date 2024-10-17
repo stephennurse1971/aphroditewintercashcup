@@ -32,6 +32,11 @@ class Instructions
      */
     private $media;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $photoOrVideo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class Instructions
     public function setMedia(?string $media): self
     {
         $this->media = $media;
+
+        return $this;
+    }
+
+    public function getPhotoOrVideo(): ?string
+    {
+        return $this->photoOrVideo;
+    }
+
+    public function setPhotoOrVideo(string $photoOrVideo): self
+    {
+        $this->photoOrVideo = $photoOrVideo;
 
         return $this;
     }

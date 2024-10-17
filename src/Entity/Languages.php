@@ -42,6 +42,11 @@ class Languages
      */
     private $linkedInOther;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $ranking;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +108,18 @@ class Languages
     public function setLinkedInOther(?bool $linkedInOther): self
     {
         $this->linkedInOther = $linkedInOther;
+
+        return $this;
+    }
+
+    public function getRanking(): ?int
+    {
+        return $this->ranking;
+    }
+
+    public function setRanking(?int $ranking): self
+    {
+        $this->ranking = $ranking;
 
         return $this;
     }

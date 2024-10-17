@@ -17,6 +17,7 @@ class LanguagesType extends AbstractType
             ->add('language')
             ->add('abbreviation')
             ->add('linkedInOther')
+            ->add('ranking')
             ->add('icon', FileType::class, [
                 'label' => 'Icon',
                 'mapped' => false,

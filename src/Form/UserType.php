@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,16 +21,33 @@ class UserType extends AbstractType
     {
         $builder
             ->add('email')
-            ->add('password')
+            ->add('emailVerified')
+            ->add('password', PasswordType::class, [
+                'label' => 'Password',
+                'required' => false,
+                'invalid_message' => 'You entered an invalid value',
+            ])
             ->add('firstName')
-            ->add('lastName');
+            ->add('lastName')
+            ->add('roles', ChoiceType::class, [
+                    'mapped' => true,
+                    'multiple' => true,
+                    'placeholder' => '',
+                    'required' => false,
+                    'choices' => [
+                        'Super_Admin' => 'ROLE_SUPER_ADMIN',
+                        'Admin' => 'ROLE_ADMIN',
+                        'Partner' => 'ROLE_PARTNER',
+                        'User' => 'ROLE_USER'
+                    ]]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'user'=>null
+            'user' => null
         ]);
     }
 

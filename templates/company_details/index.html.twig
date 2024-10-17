@@ -134,7 +134,8 @@
                     {{ company_detail.weatherLocation }}
                 </td>
                 <td>
-                    {{ company_detail.companyAddressInstructions |raw }}
+                    {% set addressInstructions = (company_detail.companyAddressInstructions|slice(0,70)) %}
+                    {{ addressInstructions |raw  }}....
                 </td>
 
                 <td style="text-align: center">

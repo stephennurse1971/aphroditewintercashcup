@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Instructions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +19,13 @@ class InstructionsType extends AbstractType
                 'label' => 'Topic'
             ])
             ->add('summary')
+            ->add('photoOrVideo', ChoiceType::class, [
+                'multiple' => false,
+                'expanded' => true,
+                'choices' => [
+                    'Photo' => 'Photo',
+                    'Video' => 'Video',
+                ],])
             ->add('media', FileType::class, [
                 'label' => 'Media',
                 'mapped' => false,

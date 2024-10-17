@@ -22,7 +22,7 @@ class   HomeController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(CmsCopyRepository $cmsCopyRepository, CmsPhotoRepository $cmsPhotoRepository, SubPageRepository $subPageRepository, CompanyDetailsRepository $companyDetailsRepository): Response
+    public function index(CmsCopyRepository $cmsCopyRepository, CmsPhotoRepository $cmsPhotoRepository, SubPageRepository $subPageRepository, CompanyDetailsRepository $companyDetailsRepository, \Symfony\Component\Security\Core\Security $security, EntityManagerInterface $entityManager): Response
     {
         $companyDetails = $companyDetailsRepository->find('1');
         $homePagePhotosOnly = 0;
@@ -37,9 +37,27 @@ class   HomeController extends AbstractController
         $cms_copy = $cmsCopyRepository->findBy([
             'staticPageName' => 'Home'
         ]);
+
         $cms_photo = $cmsPhotoRepository->findBy([
             'staticPageName' => 'Home'
         ]);
+
+        $cms_copy_ranking1 = $cmsCopyRepository->findOneBy([
+            'staticPageName' => 'Home',
+            'ranking' => '1',
+        ]);
+
+        if($cms_copy_ranking1) {
+            if ($security->getUser()) {
+                if (in_array('ROLE_ADMIN', $security->getUser()->getRoles())) {
+                    $pageCountAdmin = $cms_copy_ranking1->getPageCountAdmin();
+                    $cms_copy_ranking1->setPageCountAdmin($pageCountAdmin + 1);
+                }
+            }
+            $pageCountUser = $cms_copy_ranking1->getPageCountUsers();
+            $cms_copy_ranking1->setPageCountUsers($pageCountUser + 1);
+            $entityManager->flush($cms_copy_ranking1);
+        }
 
         if ($homePagePhotosOnly == 1) {
             return $this->render('home/home.html.twig', [
@@ -47,7 +65,7 @@ class   HomeController extends AbstractController
                 'include_contact' => 'Yes'
             ]);
         } else {
-            return $this->render('/home/products.html.twig', [
+            return $this->render('home/products.html.twig', [
                 'product' => $product,
                 'cms_copy_array' => $cms_copy,
                 'cms_photo_array' => $cms_photo,
@@ -138,7 +156,7 @@ class   HomeController extends AbstractController
             ]);
         }
 
-        if($cms_copy_ranking1) {
+        if ($cms_copy_ranking1) {
             if ($security->getUser()) {
                 if (in_array('ROLE_ADMIN', $security->getUser()->getRoles())) {
                     $pageCountAdmin = $cms_copy_ranking1->getPageCountAdmin();

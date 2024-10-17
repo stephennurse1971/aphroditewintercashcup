@@ -10,7 +10,9 @@
         <tr>
             <th>Topic</th>
             <th>Summary</th>
+            <th>Format</th>
             <th>Media</th>
+            <th>Copy link</th>
             <th style="text-align: center">#</th>
             <th style="text-align: center">#</th>
         </tr>
@@ -19,7 +21,8 @@
         {% for instruction in instructions %}
             <tr>
                 <td>{{ instruction.topic }}</td>
-                <td>{{ instruction.summary }}</td>
+                <td>{{ instruction.summary|raw }}</td>
+                <td>{{ instruction.photoOrVideo }}</td>
                 <td>
                     {% if instruction.media is not null %}
                         <i class="fa fa-file"></i>
@@ -27,9 +30,12 @@
                     {{ instruction.media }}
                 </td>
                 <td>
-                    <a class="btn btn-outline-primary btn-sm"
-                       href="{{ path('instructions_show', {'id': instruction.id}) }}">Show</a>
-                    <a class="btn btn-outline-danger btn-sm"
+                    xx
+                </td>
+                <td>
+                    <a target="_blank" class="btn btn-outline-primary btn-sm"
+                       href="{{ path('instructions_show', {'topic': instruction.topic}) }}">Show</a>
+                    <a target="_blank" class="btn btn-outline-danger btn-sm"
                        href="{{ path('instructions_edit', {'id': instruction.id}) }}">Edit</a>
                 </td>
                 <td>

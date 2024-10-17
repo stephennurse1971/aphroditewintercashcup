@@ -295,6 +295,11 @@ class CompanyDetails
      */
     private $companyAddressMapLink;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $headerDisplayContactDetails;
+
 
     public function getId(): ?int
     {
@@ -933,6 +938,18 @@ class CompanyDetails
     public function setCompanyAddressMapLink(?string $companyAddressMapLink): self
     {
         $this->companyAddressMapLink = $companyAddressMapLink;
+
+        return $this;
+    }
+
+    public function isHeaderDisplayContactDetails(): ?bool
+    {
+        return $this->headerDisplayContactDetails;
+    }
+
+    public function setHeaderDisplayContactDetails(?bool $headerDisplayContactDetails): self
+    {
+        $this->headerDisplayContactDetails = $headerDisplayContactDetails;
 
         return $this;
     }

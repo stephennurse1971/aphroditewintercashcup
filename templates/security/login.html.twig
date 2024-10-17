@@ -37,8 +37,6 @@
                     {% if CompanyDetails.companyDetails.enableUserRegistration ==1 %}
                         <h1 style="color: red" class="h3 mb-3 font-weight-normal">Welcome New Users</h1>
                         If you would like to register for this website, please click <a href="{{ path('app_register') }}">here</a>
-
-
                     {% endif %}
                 {% endif %}
             </form>
@@ -58,6 +56,10 @@
                         (Super-Admin)
                     </button>
                     <br>
+                    <button onclick="fillForm3()"><i class="fa fa-info-circle"> </i> amankr.99.a@gmail.com
+                        (User)
+                    </button>
+                    <br>
                 {% endif %}
             {% else %}
                 <b>Please set up your "Company Details" profile.</b>
@@ -72,6 +74,11 @@
                 <br>
                 <button onclick="fillForm2()"><i class="fa fa-info-circle"> </i> nurse_stephen2@hotmail.com
                     (Super-Admin)
+                </button>
+                <br>
+                <br>
+                <button onclick="fillForm3()"><i class="fa fa-info-circle"> </i> amankr.99.a@gmail.com
+                    (User)
                 </button>
                 <br>
             {% endif %}
@@ -89,6 +96,11 @@
         function fillForm2() {
             $("#inputEmail").val("nurse_stephen2@hotmail.com").change();
             $("#inputPassword").val("Descartes99").change();
+        }
+
+        function fillForm3() {
+            $("#inputEmail").val("amankr.99.a@gmail.com").change();
+            $("#inputPassword").val("password").change();
         }
 
     </script>

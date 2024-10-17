@@ -55,7 +55,10 @@ class Languages
         }
         return '';
     }
-
+public function getLanguagesByRankingOrder()
+{
+    return $this->languagesRepository->getLanguagesByRankingOrder();
+}
 
     public function __construct(LanguagesRepository $languagesRepository, RequestStack $requestStack)
     {

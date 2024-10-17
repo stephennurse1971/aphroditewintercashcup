@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Business Contact{% endblock %}
+
+{% block body %}
+    <h1 style="color: red">Business Contacts</h1>
+
+    <table class="table">
+        <tbody>
+
+        <tr>
+            <th> Name</th>
+            <td>{{ business_contact.firstName }} {{ business_contact.LastName }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>
+                {% if business_contact.email is not null %}
+                    <a title="{{ business_contact.email }}" href="mailto:{{ business_contact.email }}"
+                       class="action" data-id="{{ business_contact.id }}"
+                       data-action="Email"><i
+                                class="fas fa-envelope"> </i>
+                        {{ business_contact.email }}
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Website</th>
+            <td>
+                {% if business_contact.website  is not null %}
+                    <a data-title="{{ business_contact.website }}" target="_blank"
+                       title="{{ business_contact.website }}"
+                       href="{{ business_contact.website }}" class="action"
+                       data-id="{{ business_contact.id }}" data-action="Website">
+                        <i class="fas fa-link"> </i></a>
+                    {{ business_contact.website }}
+                {% endif %}
+            </td>
+        </tr>
+
+        <tr>
+            <th>Mobile</th>
+            <td>
+                {% if business_contact.mobile is not null %}
+                    <a title="{{ business_contact.mobile }}" target="_blank"
+                       href="https://wa.me/{{ business_contact.mobile|replace({' ': ''}) }}"
+                       class="action"
+                       data-id="{{ business_contact.id }}"
+                       data-action="WhatsApp">
+                        <i class="fab fa-whatsapp" style="color:green; text-align: center"></i></a>
+                    {{ business_contact.mobile }}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Landline</th>
+            <td>
+                {% if business_contact.landline is not null %}
+                    <a title="{{ business_contact.landline }}"
+                       href="tel:{{ business_contact.landline|replace({' ': ''}) }}" class="action"
+                       data-id="{{ business_contact.id }}"
+                       data-action="Phone">
+                        <i class="fa fa-phone" style="color:green; text-align: center"></i></a>
+                    {{ business_contact.landline }}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Company</th>
+            <td>{{ business_contact.company }}</td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td>
+                {% if business_contact.addressStreet is not empty %}
+                    {{ business_contact.addressStreet }},
+                    {{ business_contact.addressCity }},
+                    {{ business_contact.addressPostCode }}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>GPS</th>
+            <td>
+                {% if business_contact.gpsLocation is empty %}
+                    {% if is_granted('ROLE_STAFF') %}
+                        <button class="btn btn-primary btn-sm"
+                                onclick="getLocation('{{ business_contact.id }}')">
+                            Get Coordinates
+                        </button>
+                    {% else %}
+                        -
+                    {% endif %}
+                {% else %}
+                    <a target="_blank"
+                       href="{{ path('show_location_google_maps',{id: business_contact.id}) }}"
+                       class="action" data-id="{{ business_contact.id }}"
+                       data-action="Map">
+                        <i class='fas fa-map-marker-alt text-danger'></i></a>
+                {% endif %}
+
+            </td>
+        </tr>
+
+        <tr>
+            <th>Business</th>
+            <td>{{ business_contact.businessType.businessType }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-outline-primary btn-sm" href="{{ path('business_contacts_index') }}">Return to list</a>
+
+    {#    <a class="btn btn-outline-danger btn-sm" href="{{ path('business_contacts_edit', {'id': business_contact.id}) }}">Edit</a> #}
+
+{#    {{ include('business_contacts/_delete_form.html.twig') }}#}
+{% endblock %}
+
+
+
+
+
+
+
+

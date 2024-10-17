@@ -8,6 +8,7 @@ use App\Services\Languages;
 use App\Services\TranslationsWorker;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -58,7 +59,45 @@ class CompanyDetailsType extends AbstractType
             ->add('companyAddressCity')
             ->add('companyAddressPostalCode')
             ->add('companyAddressCountry')
-            ->add('companyTimeZone')
+            ->add('companyTimeZone', ChoiceType::class, [
+                'multiple' => false,
+                'placeholder' => 'GMT',
+                'expanded' => FALSE,
+                'required' => false,
+                'choices' => [
+                    'SST' => 'GMT',
+                    'HST' => 'GMT',
+                    'AKST' => 'GMT',
+                    'PST' => 'PST',
+                    'MST' => 'MST',
+                    'CST' => 'CST',
+                    'EST' => 'EST',
+                    'VET' => 'VET',
+                    'AST' => 'AST',
+                    'NST' => 'NST',
+                    'BRT' => 'BRT',
+                    'AZOT' => 'AZOT',
+                    'GMT' => 'GMT',
+                    'CET' => 'CET',
+                    'EET' => 'EET',
+                    'MSK' => 'MSK',
+                    'IRST' => 'IRST',
+                    'GST' => 'GST',
+                    'AFT' => 'AFT',
+                    'IST' => 'IST',
+                    'BTT' => 'BTT',
+                    'MMT' => 'MMT',
+                    'ICT' => 'ICT',
+                    'KST' => 'KST',
+                    'ACWST' => 'ACWST',
+                    'JST' => 'JST',
+                    'ACST' => 'ACST',
+                    'AEST' => 'AEST',
+                    'LHST' => 'LHST',
+                    'SBT' => 'SBT',
+                    'NZST' => 'NZST'
+                ],
+            ])
             ->add('currency')
             ->add('weatherLocation')
             ->add('companyAddressMapLink')
@@ -77,6 +116,9 @@ class CompanyDetailsType extends AbstractType
                 'required' => false])
             ->add('headerDisplayLogin', CheckboxType::class, [
                 'label' => 'Login',
+                'required' => false])
+            ->add('headerDisplayContactDetails', CheckboxType::class, [
+                'label' => 'Contact Details',
                 'required' => false])
             ->add('headerDisplayPricing', CheckboxType::class, [
                 'label' => 'Pricing',

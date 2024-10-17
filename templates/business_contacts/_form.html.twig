@@ -1,0 +1,39 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-2">
+        {{ form_row(form.businessOrPerson) }}
+        {{ form_row(form.company) }}
+
+        {{ form_row(form.firstName) }}
+        {{ form_row(form.lastName) }}
+
+        {{ form_row(form.email) }}
+        {{ form_row(form.mobile) }}
+        {{ form_row(form.landline) }}
+        {{ form_row(form.website) }}
+    </div>
+
+    <div class="col-2">
+        <div class="status-container">
+        {{ form_row(form.status) }}
+        {{ form_row(form.publicPrivate) }}
+        </div>
+        {% if is_granted('ROLE_STAFF') %}
+            <a target="_blank" href="{{ path('business_types_index') }}"><i class="fa fa-chart-line"></i></a>
+            <a target="_blank" href="{{ path('business_types_new') }}">+</a>
+        {% endif %}
+        {{ form_row(form.businessType) }}
+    </div>
+
+    <div class="col-2">
+        {{ form_row(form.addressStreet) }}
+        {{ form_row(form.addressCity) }}
+        {{ form_row(form.addressPostCode) }}
+        {{ form_row(form.addressCountry) }}
+        {{ form_row(form.gpsLocation) }}
+
+    </div>
+</div>
+
+<button class="btn btn-success btn-sm">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

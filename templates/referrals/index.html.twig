@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Referrals index{% endblock %}
+
+{% block body %}
+    <h1 style="color: red">Referrals</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>User</th>
+            <th>Business</th>
+            <th>Web/VCF/Phone</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for referral in referrals %}
+            <tr>
+                <td><a href="{{ path('referrals_edit', {'id': referral.id}) }}">{{ referral.id }}</a></td>
+                <td data-sort="{{ referral.dateTime|date('Y-m-d') }}">{{ referral.dateTime ? referral.dateTime|date('d-M-y') : '' }}</td>
+                <td>{{ referral.dateTime ? referral.dateTime|date('H:i') : '' }}</td>
+
+                <td>
+                    {% if referral.user is null %}
+                        Not logged in
+                    {% else %}
+                        {{ referral.user.fullName }}
+                    {% endif %}
+                </td>
+                <td>{{ referral.businessSite.company }}</td>
+                <td>{{ referral.action }}</td>
+                <td>
+                    <form method="post" action="{{ path('referrals_delete', {'id': referral.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ referral.id) }}">
+                        <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <a class="btn btn-success btn-sm" href="{{ path('referrals_new') }}">New</a>
+{% endblock %}
+
+{% block datatable %}
+    <script>
+        $(document).ready(function () {
+            $('.table').DataTable({
+                'pageLength': 100,
+                "order": [[1, 'desc']],
+                "paging": true,
+                "searching": true,
+                "bInfo": true
+            });
+        });
+    </script>
+{% endblock datatable %}

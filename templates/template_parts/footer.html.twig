@@ -86,10 +86,10 @@
                                         </a>
                                     </h6>
                                     <p>
-                                        <a target="_blank" href="{{ path('office_address') }}">
-                                            <i style="color: red" class="fa fa-map-marker mr-3"></i></a>
                                         {% if CompanyDetails.getCompanyDetails is not null %}
                                             {% if CompanyDetails.companyDetails.footerDisplayAddress ==1 %}
+                                                <a target="_blank" href="{{ path('office_address') }}">
+                                                    <i style="color: red" class="fa fa-map-marker mr-3"></i></a>
                                                 {{ CompanyDetails.getCompanyDetails.companyAddressStreet }},
                                                 {{ CompanyDetails.getCompanyDetails.companyAddressTown }},
                                                 {{ CompanyDetails.getCompanyDetails.companyAddressCity }}

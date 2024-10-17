@@ -4,10 +4,13 @@
 
 {% block body %}
     <h1 style="color: red">Languages</h1>
-
+    <a class="btn btn-success btn-sm" href="{{ path('update_ranking') }}">Re-number</a>
     <table class="table table-responsive">
         <thead>
         <tr>
+            <th>Ranking</th>
+            <th></th>
+            <th></th>
             <th>Active</th>
             <th>Language</th>
             <th>Abbreviation</th>
@@ -20,11 +23,31 @@
         <tbody>
         {% for language in languages %}
             <tr>
+                <td>{{ language.ranking }}</td>
+
+                <td>
+                    <a class="btn btn-outline-success btn-sm"
+                       href="{{ path('language_change_ranking', {'id':language.id, 'change':'Up'}) }}">
+                        <i style="color: green" class="fas fa-arrow-up"></i>
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-outline-secondary btn-sm"
+                       href="{{ path('language_change_ranking', {'id':language.id, 'change':'Down'}) }}">
+                        <i style="color: red" class="fa fa-arrow-down"></i>
+                    </a>
+                </td>
+
+
                 <td data-sort="{{ language.isActive }}" style="text-align: center">
                     {% if language.isActive ==1 %}
-                        <i style="color: green" class="fa fa-check"></i>
+                        <a href="{{ path('language_change_active_or_inactive', {id:language.id}) }}">
+                            <i style="color: green" class="fa fa-check"></i>
+                        </a>
                     {% else %}
-                        <i style="color: red" class="fa fa-remove"></i>
+                        <a href="{{ path('language_change_active_or_inactive', {id:language.id}) }}">
+                            <i style="color: red" class="fa fa-remove"></i>
+                        </a>
                     {% endif %}
                 </td>
                 <td>{{ language.language }}</td>
@@ -67,7 +90,7 @@
         $(document).ready(function () {
             $('.table').DataTable({
                 'pageLength': 100,
-                "order": [[0, 'desc'], [1, 'asc']],
+                "order": [[0, 'asc']],
                 "paging": false,
                 "searching": false,
                 "bInfo": false
