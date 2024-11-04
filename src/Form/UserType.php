@@ -29,6 +29,10 @@ class UserType extends AbstractType
             ])
             ->add('firstName')
             ->add('lastName')
+            ->add('playingSingles')
+            ->add('playingDoubles')
+            ->add('paidAmount')
+            ->add('paidTo')
             ->add('roles', ChoiceType::class, [
                     'mapped' => true,
                     'multiple' => true,

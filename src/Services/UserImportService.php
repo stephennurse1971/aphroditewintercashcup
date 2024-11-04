@@ -5,9 +5,8 @@ namespace App\Services;
 
 
 use App\Entity\Import;
-use App\Entity\ProjectSpecific\User;
-use App\Repository\ProjectSpecific\UserRepository;
-use App\Services\ATS\CountriesRepository;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -39,22 +38,10 @@ class UserImportService
             $firstName = trim($oneLineFromCsv[0]);
             $lastName = trim($oneLineFromCsv[1]);
             $email = trim($oneLineFromCsv[2]);
-            $landline = trim($oneLineFromCsv[3]);
-            $mobile1 = trim($oneLineFromCsv[4]);
-            $mobile2 = trim($oneLineFromCsv[5]);
+            $mobile = trim($oneLineFromCsv[3]);
+            $playingSingles = trim($oneLineFromCsv[4]);
+            $playingDoubles = trim($oneLineFromCsv[5]);
 
-            $dateOfBirth = trim($oneLineFromCsv[7]);
-            $homeAddressStreet = trim($oneLineFromCsv[8]);
-            $homeAddressCity = trim($oneLineFromCsv[9]);
-            $homeAddressPostCode = trim($oneLineFromCsv[10]);
-            $homeAddressCountry = trim($oneLineFromCsv[11]);
-            $country = null;
-
-            $get_country = $this->countriesRepository->findOneBy(['country'=>$homeAddressCountry]);
-            if($get_country){
-                $country = $get_country;
-            }
-            $notes = trim($oneLineFromCsv[12]);
 
             if ($email == '') {
                 continue;
@@ -73,15 +60,10 @@ class UserImportService
                 $user->setFirstName($firstName)
                     ->setLastName($lastName)
                     ->setEmail($email)
-                    ->setBusinessPhone($landline)
-                    ->setMobile($mobile1)
-                    ->setMobile2($mobile2)
-                    ->setBirthday(new \DateTime($dateOfBirth))
-                    ->setHomeStreet($homeAddressStreet)
-                    ->setHomeCity($homeAddressCity)
-                    ->setHomePostalCode($homeAddressPostCode)
-                    ->setHomeCountry($country)
-                    ->setRoles(['ROLE_CLIENT'])
+                    ->setMobile($mobile)
+                    ->setPlayingSingles($playingSingles)
+                    ->setPlayingDoubles($playingDoubles)
+                    ->setRoles(['ROLE_USER'])
                 ;
                 $this->manager->persist($user);
                 $this->manager->flush();
@@ -91,12 +73,11 @@ class UserImportService
         return null;
     }
 
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher,ContainerInterface $container, UserRepository $userRepository, EntityManagerInterface $manager,CountriesRepository $countriesRepository)
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ContainerInterface $container, \App\Repository\UserRepository $userRepository, EntityManagerInterface $manager)
     {
         $this->container = $container;
         $this->manager = $manager;
         $this->userRepository = $userRepository;
-        $this->countriesRepository = $countriesRepository;
         $this->userPasswordHasher = $userPasswordHasher;
     }
 }

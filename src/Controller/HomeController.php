@@ -47,7 +47,7 @@ class   HomeController extends AbstractController
             'ranking' => '1',
         ]);
 
-        if($cms_copy_ranking1) {
+        if ($cms_copy_ranking1) {
             if ($security->getUser()) {
                 if (in_array('ROLE_ADMIN', $security->getUser()->getRoles())) {
                     $pageCountAdmin = $cms_copy_ranking1->getPageCountAdmin();
@@ -92,7 +92,7 @@ class   HomeController extends AbstractController
         } else {
             $user = new User();
             $user->setFirstName('Stephen')
-                ->setLastName('NurseHMX')
+                ->setLastName('Nurse')
                 ->setEmailVerified(1)
                 ->setEmail('nurse_stephen@hotmail.com')
                 ->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'])
@@ -195,33 +195,6 @@ class   HomeController extends AbstractController
         ]);
     }
 
-
-    /**
-     * @Route("/office_address", name="office_address", methods={"GET"})
-     */
-    public function officeAddress(CompanyDetailsRepository $companyDetailsRepository): Response
-    {
-        return $this->render('home/officeAddress.html.twig');
-    }
-
-
-    /**
-     * @Route("/gps_location", name="gps_location", methods={"GET"})
-     */
-    public function gpsLocation(CompanyDetailsRepository $companyDetailsRepository): Response
-    {
-        $companyDetails = $companyDetailsRepository->find('1');
-
-        $longitude = $companyDetails->getCompanyAddressLongitude();
-        $latitude = $companyDetails->getCompanyAddressLatitude();
-
-        return $this->render('home/gpsLocation.html.twig', [
-            'longitude' => $longitude,
-            'latitude' => $latitude,
-        ]);
-    }
-
-
     /**
      * @Route("/view/file/{filetype}/{id}", name="attachments_viewfile", methods={"GET"})
      */
@@ -287,6 +260,19 @@ class   HomeController extends AbstractController
             ->addNote(strip_tags($notes_all));
         $vcard->download();
         return new Response(null);
+    }
+
+    /**
+     * @Route("/company_qr_code", name="company_qr_code")
+     *
+     */
+    public function companyQrCode(CompanyDetailsRepository $companyDetailsRepository)
+    {
+        $company_details = $companyDetailsRepository->find('1');
+        $qr_code = $company_details->getCompanyQrCode();
+        return $this->render('home/company_qr_code.html.twig', [
+            'qr_code' => $qr_code,
+        ]);
     }
 
 

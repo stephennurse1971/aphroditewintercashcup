@@ -4,8 +4,8 @@ namespace App\Form;
 
 use App\Entity\CompanyDetails;
 use App\Repository\TranslationRepository;
-use App\Services\Languages;
-use App\Services\TranslationsWorker;
+use App\Services\LanguagesService;
+use App\Services\TranslationsWorkerService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -61,13 +61,12 @@ class CompanyDetailsType extends AbstractType
             ->add('companyAddressCountry')
             ->add('companyTimeZone', ChoiceType::class, [
                 'multiple' => false,
-                'placeholder' => 'GMT',
                 'expanded' => FALSE,
                 'required' => false,
                 'choices' => [
-                    'SST' => 'GMT',
-                    'HST' => 'GMT',
-                    'AKST' => 'GMT',
+                    'SST' => 'SST',
+                    'HST' => 'HST',
+                    'AKST' => 'AKST',
                     'PST' => 'PST',
                     'MST' => 'MST',
                     'CST' => 'CST',
@@ -129,6 +128,12 @@ class CompanyDetailsType extends AbstractType
             ->add('headerDisplayTandCs', CheckboxType::class, [
                 'label' => 'T&Cs',
                 'required' => false])
+            ->add('headerDisplayBusinessContacts', CheckboxType::class, [
+                'label' => 'Business Contacts',
+                'required' => false])
+            ->add('headerDisplayWeather', CheckboxType::class, [
+                'label' => 'Weather',
+                'required' => false])
             ->add('footerDisplayContactDetails', CheckboxType::class, [
                 'label' => 'Contact Details',
                 'required' => false])
@@ -172,7 +177,7 @@ class CompanyDetailsType extends AbstractType
             'data_class' => CompanyDetails::class,
         ]);
     }
-    public function __construct(TranslationsWorker $translationsWorker)
+    public function __construct(TranslationsWorkerService $translationsWorker)
     {
       $this->translationsWorker = $translationsWorker;
     }

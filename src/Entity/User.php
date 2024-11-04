@@ -55,6 +55,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $emailVerified;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $playingSingles;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $playingDoubles;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $paidAmount;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $paidTo;
+
 
 
     public function getId(): ?int
@@ -182,6 +202,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailVerified(bool $emailVerified): self
     {
         $this->emailVerified = $emailVerified;
+
+        return $this;
+    }
+
+    public function isPlayingSingles(): ?bool
+    {
+        return $this->playingSingles;
+    }
+
+    public function setPlayingSingles(?bool $playingSingles): self
+    {
+        $this->playingSingles = $playingSingles;
+
+        return $this;
+    }
+
+    public function isPlayingDoubles(): ?bool
+    {
+        return $this->playingDoubles;
+    }
+
+    public function setPlayingDoubles(?bool $playingDoubles): self
+    {
+        $this->playingDoubles = $playingDoubles;
+
+        return $this;
+    }
+
+    public function getPaidAmount(): ?int
+    {
+        return $this->paidAmount;
+    }
+
+    public function setPaidAmount(?int $paidAmount): self
+    {
+        $this->paidAmount = $paidAmount;
+
+        return $this;
+    }
+
+    public function getPaidTo(): ?string
+    {
+        return $this->paidTo;
+    }
+
+    public function setPaidTo(?string $paidTo): self
+    {
+        $this->paidTo = $paidTo;
 
         return $this;
     }
