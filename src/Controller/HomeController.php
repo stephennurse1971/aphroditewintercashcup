@@ -28,6 +28,7 @@ class   HomeController extends AbstractController
         $homePagePhotosOnly = 0;
         if ($companyDetails) {
             $homePagePhotosOnly = $companyDetails->isHomePagePhotosOnly();
+            $qrcode = $companyDetails->isIncludeQRCodeHomePage();
         }
 
         $cms_copy = [];
@@ -61,8 +62,7 @@ class   HomeController extends AbstractController
 
         if ($homePagePhotosOnly == 1) {
             return $this->render('home/home.html.twig', [
-                'photos' => $cms_photo,
-                'include_contact' => 'Yes'
+                'photos' => $cms_photo
             ]);
         } else {
             return $this->render('home/products.html.twig', [
@@ -70,7 +70,8 @@ class   HomeController extends AbstractController
                 'cms_copy_array' => $cms_copy,
                 'cms_photo_array' => $cms_photo,
                 'sub_pages' => $sub_pages,
-                'include_contact' => 'Yes'
+                'include_contact' => 'Yes',
+                'include_QR_code' => $qrcode
             ]);
         }
     }
@@ -112,12 +113,12 @@ class   HomeController extends AbstractController
 
     /**
      * @Route("/dashboard", name="dashboard")
-     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function dashboard()
     {
         return $this->render('home/dashboard.html.twig', []);
     }
+
 
     /**
      * @Route("/advanced_dashboard", name="advanced_dashboard")
@@ -191,29 +192,9 @@ class   HomeController extends AbstractController
             'cms_copy_array' => $cms_copy,
             'cms_photo_array' => $cms_photo,
             'sub_pages' => $sub_pages,
-            'include_contact' => 'No'
+            'include_contact' => 'No',
+            'include_QR_code' => 'No'
         ]);
-    }
-
-    /**
-     * @Route("/view/file/{filetype}/{id}", name="attachments_viewfile", methods={"GET"})
-     */
-    public function investmentFileLaunch(int $id, string $filetype): Response
-    {
-        $fileName = '';
-        $filepath = '';
-
-        if ($fileName != '') {
-            $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-            $filepath = explode("public", $filepath);
-            $filepath = $filepath[1];
-            return $this->render('home/file_view.html.twig', [
-                'ext' => $ext,
-                'tab_title' => $fileName,
-                'filepath' => $filepath,
-            ]);
-        }
-        return $this->render('error/file_not_found.html.twig');
     }
 
 

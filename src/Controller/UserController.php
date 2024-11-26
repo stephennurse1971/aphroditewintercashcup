@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Entity\User;
 use App\Form\ImportType;
 use App\Form\UserType;
@@ -154,47 +155,96 @@ class UserController extends AbstractController
     public function deleteAllNonAdminUsers(UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
         $users = $userRepository->findAll();
-//        foreach ($users as $user) {
-//            if (!in_array('ROLE_ADMIN', $user->getRoles()){};
-////            {
-////            $entityManager = $this->getDoctrine()->getManager();
-////            $entityManager->remove($user);
-////            $entityManager->flush();
-////            }
-//            }
+        foreach ($users as $user) {
+            if (!in_array('ROLE_ADMIN', $user->getRoles())) {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->remove($user);
+                $entityManager->flush();
+            }
+        }
         return $this->redirectToRoute('user_index');
     }
 
 
     /**
-     * @Route ("/import/users", name="users_import" )
+     * @Route ("/export", name="user_export" )
+     * @Security("is_granted('ROLE_ADMIN')")
      */
-    public function usersImport(Request $request, SluggerInterface $slugger, UserRepository $userRepository, UserImportService $userImportService): Response
+    public
+    function exportUsers(UserRepository $userRepository)
     {
-        $form = $this->createForm(ImportType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $importFile = $form->get('File')->getData();
-            if ($importFile) {
-                $originalFilename = pathinfo($importFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '.' . 'csv';
-                try {
-                    $importFile->move(
-                        $this->getParameter('business_contact_attachments_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    die('Import failed');
-                }
-                $userImportService->importUsers($newFilename);
-                return $this->redirectToRoute('user_index');
-            }
+        $data = [];
+        $user_list = $userRepository->findAll();
+        $fileName = 'all_users_export.csv';
+        $exported_date = new \DateTime('now');
+        $exported_date = $exported_date->format('d-M-Y h:m');
+        $count = 0;
+
+        foreach ($user_list as $user) {
+            $data[] = [
+                $user->getFirstName(),
+                $user->getLastName(),
+                $user->getEmail(),
+            ];
         }
-        return $this->render('business_contacts/import.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Users');
+        $sheet->getCell('A1')->setValue('First Name');
+        $sheet->getCell('B1')->setValue('Last Name');
+        $sheet->getCell('C1')->setValue('Email');
+
+        $sheet->fromArray($data, null, 'A2', true);
+        $total_rows = $sheet->getHighestRow();
+        for ($i = 2; $i <= $total_rows; $i++) {
+            $cell = "L" . $i;
+            $sheet->getCell($cell)->getHyperlink()->setUrl("https://google.com");
+        }
+        $writer = new Csv($spreadsheet);
+
+
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
+        $response->headers->set('Content-Disposition', sprintf('attachment;filename="%s"', $fileName));
+        $response->headers->set('Cache-Control', 'max-age=0');
+        return $response;
     }
 
+    /**
+     * @Route("/change_playing_singles_or_doubles/{singles_or_doubles}/{id}", name="change_playing_singles_or_doubles", methods={"GET", "POST"})
+     */
+    public function changePlayingSinglesOrDoubles(Request $request, $singles_or_doubles, User $user, EntityManagerInterface $manager): Response
+    {
+        $referer = $request->headers->get('Referer');
+        $singles = $user->isPlayingSingles();
+        $doubles = $user->isPlayingDoubles();
+
+        if ($singles_or_doubles == "Singles") {
+            if ($singles == false) {
+                $user->setPlayingSingles(true);
+                $manager->flush();
+            }
+            if ($singles == true) {
+                $user->setPlayingSingles(false);
+                $manager->flush();
+            }
+        }
+        if ($singles_or_doubles == "Doubles") {
+            if ($doubles == false) {
+                $user->setPlayingDoubles(1);
+                $manager->flush();
+            }
+            if ($doubles == true) {
+                $user->setPlayingDoubles(0);
+                $manager->flush();
+            }
+        }
+
+//        $manager->flush();
+        return $this->redirect($referer);
+    }
 
 }

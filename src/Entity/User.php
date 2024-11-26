@@ -75,6 +75,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $paidTo;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mobile;
+
 
 
     public function getId(): ?int
@@ -250,6 +255,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPaidTo(?string $paidTo): self
     {
         $this->paidTo = $paidTo;
+
+        return $this;
+    }
+
+    public function getMobile(): ?string
+    {
+        return $this->mobile;
+    }
+
+    public function setMobile(?string $mobile): self
+    {
+        $this->mobile = $mobile;
 
         return $this;
     }

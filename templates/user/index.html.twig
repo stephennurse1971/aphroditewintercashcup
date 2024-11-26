@@ -7,20 +7,9 @@
 {% block body %}
 
     <h1 style="color: red">Users</h1>
+    {% include 'user/parts/delete_and_import_and_export_buttons.html.twig' %}
 
-    {% if is_granted('ROLE_SUPER_ADMIN') %}
-        <div class="row">
-            <div class="col-2">
-                <a class="btn btn-success btn-sm" href="{{ path('user_new') }}">New</a>
-            </div>
-            <div class="col-4">
-                <a class="btn btn-outline-primary btn-sm" href="{{ path('users_import') }}">Import Users</a>
-                <a class="btn btn-outline-danger btn-sm" href="{{ path('user_delete_all_non_admin') }}">Delete Non-Admin</a>
-            </div>
-        </div>
-    {% endif %}
 
-    <br>
 
     <table class="table table-responsive">
         <thead>
@@ -28,25 +17,55 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
+            <th>Mobile</th>
             <th>Roles</th>
-            <th>Verified</th>
             <th>Playing<br>Singles</th>
             <th>Playing<br>Doubles</th>
+            <th>Owed</th>
             <th>Paid<br>Amount</th>
             <th>Paid<br>To</th>
             <th>#</th>
+            <th>#</th>
         </tr>
+        {% set total_singles = 0 %}
+        {% set total_doubles = 0 %}
+        {% set total_owed =0 %}
+        {% set total_paid =0 %}
+
+        {% set total_paid_to_SN =0 %}
         </thead>
         <tbody>
         {% for user in users %}
+            {% set owed_by_player =0 %}
             <tr>
                 <td>{{ user.firstName }}</td>
                 <td>{{ user.lastName }}</td>
-                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.emailVerified == 1 %}
+                        <i style="color: green" class="fa fa-check"></i>
+                    {% else %}
+                        <i style="color: red" class="fa fa-remove"></i>
+                    {% endif %}
+                    {% if user.email == (user.firstName ~ user.lastName ~ 'NoEmail@no_email.com') %}
+                        <span style="background-color: yellow">
+                    {{ user.email }}
+                </span>
+                    {% else %}
+                        {{ user.email }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.mobile is not null %}
+                        <a target="_blank"
+                           href="https://wa.me/{{ user.mobile|replace({' ': ''}) }}">
+                            <i class="fab fa-whatsapp" style="color:green; text-align: center"></i></a>
+                        {{ user.mobile }}
+                    {% endif %}
+                </td>
                 <td>
                     {% for role in user.roles %}
                         {% if role == 'ROLE_ADMIN' %}
-                            <i class="fa fa-hat-wizard"></i>
+                            <i style="color: red" class="fa fa-hat-wizard"></i>
                         {% endif %}
 
                         {% if role == 'ROLE_USER' %}
@@ -54,42 +73,80 @@
                         {% endif %}
                     {% endfor %}
                 </td>
-                <td style="text-align: center">
-                    {% if user.emailVerified == 1 %}
-                        <i style="color: green" class="fa fa-check"></i>
-                    {% else %}
-                        <i style="color: red" class="fa fa-remove"></i>
-                    {% endif %}
-                </td>
+
                 <td style="text-align: center">
                     {% if user.playingSingles ==1 %}
-                        <i style="color: blue" class="fa fa-user"></i>
+                        <i style="color: green" class="fa fa-user"></i>
+                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">-</a>
+                        {% set total_singles = total_singles+1 %}
                     {% else %}
-                        {#                        <i style="color: red" class="fa fa-remove"></i> #}
+                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">+</a>
+
                     {% endif %}
                 </td>
+
                 <td style="text-align: center">
                     {% if user.playingDoubles ==1 %}
                         <i style="color: blue" class="fa fa-user-friends"></i>
+                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">-</a>
+
+                        {% set total_doubles = total_doubles +1 %}
                     {% else %}
-                        {#                        <i style="color: red" class="fa fa-remove"></i> #}
+                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">+</a>
                     {% endif %}
                 </td>
-                <td>
-                    {{ user.paidAmount |number_format() }}
+
+                <td style="text-align: right">
+                    {% if user.playingSingles == 1 %}
+                        {% set owed_by_player = 50 %}
+                    {% endif %}
+                    {% if user.playingDoubles == 1 %}
+                        {% set owed_by_player = owed_by_player + 30 %}
+                    {% endif %}
+                    {{ owed_by_player|number_format(2, '.', ',') }}
+
+                    {% set total_owed = total_owed + owed_by_player %}
+                </td>
+
+                <td style="text-align: right">
+                    {{ user.paidAmount |number_format(2, '.', ',') }}
+                    {% set total_paid = total_paid + user.paidAmount %}
                 </td>
                 <td>
                     {{ user.paidTo }}
+                    {% if user.paidTo =="SN" %}
+                        {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
+                    {% endif %}
                 </td>
                 <td>
                     <a class="btn btn-outline-danger btn-sm"
                        href="{{ path('user_edit', {fullName:user.fullName}) }}">Edit</a>
                 </td>
+                <td>
+                    <form method="post" action="{{ path('user_delete', {'id': user.id}) }}"
+                          onsubmit="return confirm('Are you sure you want to delete this item?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-1">
+            <b>Singles:</b> {{ total_singles }}
+        </div>
+        <div class="col-1">
+            <b>Doubles:</b> {{ total_doubles }}
+        </div>
+        <div class="col-3">
+            <b>Total Owed:</b> {{ total_owed|number_format(2, '.', ',') }}<br>
+            <b>Total Paid:</b> {{ total_paid|number_format(2, '.', ',') }}<br>
+            <b>Total Collected by SN:</b> {{ total_paid_to_SN|number_format(2, '.', ',') }}
+        </div>
+    </div>
 {% endblock %}
 
 {% block datatable %}

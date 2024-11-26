@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\Import;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -42,7 +41,6 @@ class UserImportService
             $playingSingles = trim($oneLineFromCsv[4]);
             $playingDoubles = trim($oneLineFromCsv[5]);
 
-
             if ($email == '') {
                 continue;
             }
@@ -51,20 +49,14 @@ class UserImportService
                 continue;
             } else {
                 $user = new User();
-                $user->setPassword(
-                    $this->userPasswordHasher->hashPassword(
-                        $user,
-                        $user->getPassword()
-                    )
-                );
+                $user->setPassword($this->userPasswordHasher->hashPassword($user, $user->getPassword()));
                 $user->setFirstName($firstName)
                     ->setLastName($lastName)
                     ->setEmail($email)
                     ->setMobile($mobile)
                     ->setPlayingSingles($playingSingles)
                     ->setPlayingDoubles($playingDoubles)
-                    ->setRoles(['ROLE_USER'])
-                ;
+                    ->setRoles(['ROLE_USER']);
                 $this->manager->persist($user);
                 $this->manager->flush();
             }

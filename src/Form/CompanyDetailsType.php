@@ -131,6 +131,14 @@ class CompanyDetailsType extends AbstractType
             ->add('headerDisplayBusinessContacts', CheckboxType::class, [
                 'label' => 'Business Contacts',
                 'required' => false])
+            ->add('headerDisplayFacebookPages', CheckboxType::class, [
+                'label' => 'Facebook Pages',
+                'required' => false])
+            ->add('facebookReviewsHistoryShowMonths')
+            ->add('headerDisplayCompetitors', CheckboxType::class, [
+                'label' => 'Competitors',
+                'required' => false])
+
             ->add('headerDisplayWeather', CheckboxType::class, [
                 'label' => 'Weather',
                 'required' => false])
@@ -166,6 +174,7 @@ class CompanyDetailsType extends AbstractType
                 'required' => false])
             ->add('titleProducts')
             ->add('titleSubProducts')
+            ->add('titleUsefulLinks')
             ->add('enableUserRegistration')
             ->add('registrationEmail')
         ;

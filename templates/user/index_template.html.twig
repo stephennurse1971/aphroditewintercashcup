@@ -7,6 +7,7 @@
 {% block body %}
 
         <h1 style="color: red">Users</h1>
+    {% include 'user/parts/delete_and_import_and_export_buttons.html.twig' %}
         <div class="row">
             <div class="col-2">
                 <a class="btn btn-success btn-sm" href="{{ path('user_new') }}">New</a>
