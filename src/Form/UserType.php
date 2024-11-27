@@ -32,6 +32,11 @@ class UserType extends AbstractType
             ->add('mobile')
             ->add('playingSingles')
             ->add('playingDoubles')
+            ->add('doublesPartner',EntityType::class,[
+                'class'=>User::class,
+                'required'=>false,
+                'choice_label'=>'fullName'
+            ])
             ->add('paidAmount')
             ->add('paidTo')
             ->add('roles', ChoiceType::class, [

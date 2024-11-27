@@ -170,8 +170,7 @@ class UserController extends AbstractController
      * @Route ("/export", name="user_export" )
      * @Security("is_granted('ROLE_ADMIN')")
      */
-    public
-    function exportUsers(UserRepository $userRepository)
+    public function exportUsers(UserRepository $userRepository)
     {
         $data = [];
         $user_list = $userRepository->findAll();
@@ -243,7 +242,32 @@ class UserController extends AbstractController
             }
         }
 
-//        $manager->flush();
+        if ($singles_or_doubles == "Pay SN 50") {
+                $user->setPaidTo('SN');
+                $user->setPaidAmount('50');
+                $manager->flush();
+        }
+
+        if ($singles_or_doubles == "Pay SN 80") {
+            $user->setPaidTo('SN');
+            $user->setPaidAmount('80');
+            $manager->flush();
+        }
+
+        if ($singles_or_doubles == "Pay NR 100") {
+            $user->setPaidTo('NR');
+            $user->setPaidAmount('100');
+            $manager->flush();
+        }
+        if ($singles_or_doubles == "Reset payments") {
+            $user->setPaidTo(null);
+            $user->setPaidAmount(null);
+            $manager->flush();
+        }
+
+
+
+
         return $this->redirect($referer);
     }
 

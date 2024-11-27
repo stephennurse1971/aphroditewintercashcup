@@ -80,6 +80,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $mobile;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     */
+    private $doublesPartner;
+
 
 
     public function getId(): ?int
@@ -267,6 +272,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setMobile(?string $mobile): self
     {
         $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    public function getDoublesPartner(): ?self
+    {
+        return $this->doublesPartner;
+    }
+
+    public function setDoublesPartner(?self $doublesPartner): self
+    {
+        $this->doublesPartner = $doublesPartner;
 
         return $this;
     }

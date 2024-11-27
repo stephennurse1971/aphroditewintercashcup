@@ -5,12 +5,8 @@
 {% endblock %}
 
 {% block body %}
-
     <h1 style="color: red">Users</h1>
     {% include 'user/parts/delete_and_import_and_export_buttons.html.twig' %}
-
-
-
     <table class="table table-responsive">
         <thead>
         <tr>
@@ -18,12 +14,15 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th>Roles</th>
+            <th style="border-right: 1px dotted">Roles</th>
             <th>Playing<br>Singles</th>
             <th>Playing<br>Doubles</th>
+            <th style="border-right: 1px dotted">Doubles<br>Partner</th>
             <th>Owed</th>
             <th>Paid<br>Amount</th>
             <th>Paid<br>To</th>
+            <th style="border-right: 1px dotted">Outstanding</th>
+            <th>#</th>
             <th>#</th>
             <th>#</th>
         </tr>
@@ -51,25 +50,23 @@
                     {{ user.email }}
                 </span>
                     {% else %}
+                        <a href="mailto:{{ user.email }}">
+                            <i class="fas fa-envelope"> </i></a>
                         {{ user.email }}
                     {% endif %}
                 </td>
                 <td>
-                    {% if user.mobile is not null %}
+                    {% if user.mobile is not empty %}
                         <a target="_blank"
                            href="https://wa.me/{{ user.mobile|replace({' ': ''}) }}">
                             <i class="fab fa-whatsapp" style="color:green; text-align: center"></i></a>
                         {{ user.mobile }}
                     {% endif %}
                 </td>
-                <td>
+                <td style="text-align: center; border-right: 1px dotted">
                     {% for role in user.roles %}
                         {% if role == 'ROLE_ADMIN' %}
-                            <i style="color: red" class="fa fa-hat-wizard"></i>
-                        {% endif %}
-
-                        {% if role == 'ROLE_USER' %}
-                            <i class="fa fa-user"></i>
+                            <i title="ROLE_ADMIN" style="color: red" class="fa fa-hat-wizard"></i>
                         {% endif %}
                     {% endfor %}
                 </td>
@@ -81,7 +78,6 @@
                         {% set total_singles = total_singles+1 %}
                     {% else %}
                         <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">+</a>
-
                     {% endif %}
                 </td>
 
@@ -95,21 +91,32 @@
                         <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">+</a>
                     {% endif %}
                 </td>
-
+                <td style="text-align: right; border-right: 1px dotted">
+                    {% if user.doublesPartner is not null %}
+                        {{ user.doublesPartner.fullName }}
+                    {% endif %}
+                </td>
                 <td style="text-align: right">
                     {% if user.playingSingles == 1 %}
                         {% set owed_by_player = 50 %}
                     {% endif %}
                     {% if user.playingDoubles == 1 %}
-                        {% set owed_by_player = owed_by_player + 30 %}
+                        {% set owed_by_player = owed_by_player + 50 %}
                     {% endif %}
-                    {{ owed_by_player|number_format(2, '.', ',') }}
+                    {% if user.playingDoubles == 1 and user.playingSingles ==1 %}
+                        {% set owed_by_player = owed_by_player -20 %}
+                    {% endif %}
+                    {% if owed_by_player >0 %}
+                        {{ owed_by_player|number_format(0, '.', ',') }}
+                    {% endif %}
 
                     {% set total_owed = total_owed + owed_by_player %}
                 </td>
 
                 <td style="text-align: right">
-                    {{ user.paidAmount |number_format(2, '.', ',') }}
+                    {% if user.paidAmount >0 %}
+                        {{ user.paidAmount |number_format(0, '.', ',') }}
+                    {% endif %}
                     {% set total_paid = total_paid + user.paidAmount %}
                 </td>
                 <td>
@@ -118,16 +125,40 @@
                         {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
                     {% endif %}
                 </td>
+                <td style="text-align: right; border-right: 1px dotted">
+                    {% set outstanding_by_player = owed_by_player - user.paidAmount %}
+                    {% if outstanding_by_player !=0 %}
+                        {{ outstanding_by_player|number_format(0, '.', ',') }}
+                    {% endif %}
+                </td>
                 <td>
                     <a class="btn btn-outline-danger btn-sm"
                        href="{{ path('user_edit', {fullName:user.fullName}) }}">Edit</a>
                 </td>
                 <td>
-                    <form method="post" action="{{ path('user_delete', {'id': user.id}) }}"
-                          onsubmit="return confirm('Are you sure you want to delete this item?');">
+                    <form method="post" action="{{ path('user_delete', {'id': user.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
                         <button class="btn btn-danger btn-sm">Delete</button>
                     </form>
+                </td>
+                <td>
+                    {% if user.playingSingles is not null or user.playingDoubles is not null %}
+                        {% if user.paidAmount < 1 %}
+                            <a class="btn btn-outline-primary btn-sm"
+                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 50', id: user.id}) }}">Paid
+                                SN 50</a>
+                            <a class="btn btn-outline-primary btn-sm"
+                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 80', id: user.id}) }}">Paid
+                                SN 80</a>
+                            <a class="btn btn-outline-primary btn-sm"
+                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 100', id: user.id}) }}">Paid
+                                NR 100</a>
+                        {% else %}
+                            <a class="btn btn-outline-primary btn-sm"
+                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Reset payments', id: user.id}) }}">Reset
+                                payments</a>
+                        {% endif %}
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -141,10 +172,17 @@
         <div class="col-1">
             <b>Doubles:</b> {{ total_doubles }}
         </div>
-        <div class="col-3">
-            <b>Total Owed:</b> {{ total_owed|number_format(2, '.', ',') }}<br>
-            <b>Total Paid:</b> {{ total_paid|number_format(2, '.', ',') }}<br>
-            <b>Total Collected by SN:</b> {{ total_paid_to_SN|number_format(2, '.', ',') }}
+        <div class="col-1">
+            <b>Total:</b> <br>
+            <b>Paid:</b> <br>
+            <b>Outstanding:</b> <br>
+            <b>Collected by SN:</b>
+        </div>
+        <div class="col-1">
+            € {{ total_owed|number_format(2, '.', ',') }}<br>
+            <u> € {{ total_paid|number_format(2, '.', ',') }}</u><br>
+            € {{ (total_owed - total_paid)|number_format(2, '.', ',') }}<br>
+            € {{ total_paid_to_SN|number_format(2, '.', ',') }}
         </div>
     </div>
 {% endblock %}
@@ -155,8 +193,8 @@
             $('.table').DataTable({
                 'pageLength': 100,
                 "order": [[0, 'asc'], [1, 'asc']],
-                "paging": false,
-                "searching": false,
+                "paging": true,
+                "searching": true,
                 "bInfo": false
             });
         });
