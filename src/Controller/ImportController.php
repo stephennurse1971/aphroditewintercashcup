@@ -37,7 +37,7 @@ class ImportController extends AbstractController
                         $newFilename
                     );
                 } catch (FileException $e) {
-                    die('Import failed');
+                    die('Import failed xx');
                 }
 
                 $importUserService->importUser($newFilename);
