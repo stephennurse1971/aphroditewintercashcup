@@ -37,66 +37,68 @@
                         {% endif %}
                         {% for cms_copy in cms_copy_array|sort((a, b) => a.ranking <=> b.ranking) %}
 
-                            <b>{{ cms_copy.getPageLayout.name }}</b>
+                            {% if cms_copy.pageLayout is not null %}
+                                <b>{{ cms_copy.getPageLayout.name }}</b>
 
-                            {% if cms_copy.getPageLayout.name  == "Accordion" %}
-                                {% include 'home/products_page/formats/accordion.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Accordion" %}
+                                    {% include 'home/products_page/formats/accordion.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Card Layout" %}
-                                {% include 'home/products_page/formats/card_layout.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Card Layout" %}
+                                    {% include 'home/products_page/formats/card_layout.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Carousel/Slider" %}
-                                {% include 'home/products_page/formats/carousel_slider.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Carousel/Slider" %}
+                                    {% include 'home/products_page/formats/carousel_slider.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Fullscreen Sections" %}
-                                {% include 'home/products_page/formats/fullscreen_sections.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Fullscreen Sections" %}
+                                    {% include 'home/products_page/formats/fullscreen_sections.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Grid Layout" %}
-                                {% include 'home/products_page/formats/grid_layout.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Grid Layout" %}
+                                    {% include 'home/products_page/formats/grid_layout.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Hero Banner" %}
-                                {% include 'home/products_page/formats/hero_banner.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Hero Banner" %}
+                                    {% include 'home/products_page/formats/hero_banner.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "List/Stacked Content" %}
-                                {% include 'home/products_page/formats/list_stacked_content.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "List/Stacked Content" %}
+                                    {% include 'home/products_page/formats/list_stacked_content.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Masonry Layout" %}
-                                {% include 'home/products_page/formats/masonry_layout.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Masonry Layout" %}
+                                    {% include 'home/products_page/formats/masonry_layout.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Parallax Scrolling" %}
-                                {% include 'home/products_page/formats/parallax_scrolling.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Parallax Scrolling" %}
+                                    {% include 'home/products_page/formats/parallax_scrolling.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Sidebar Layout" %}
-                                {% include 'home/products_page/formats/sidebar_layout.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Sidebar Layout" %}
+                                    {% include 'home/products_page/formats/sidebar_layout.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Single Page Scroll" %}
-                                {% include 'home/products_page/formats/single_page_scroll.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Single Page Scroll" %}
+                                    {% include 'home/products_page/formats/single_page_scroll.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Split Screen" %}
-                                {% include 'home/products_page/formats/split_screen.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Split Screen" %}
+                                    {% include 'home/products_page/formats/split_screen.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Sticky Header/Footer" %}
-                                {% include 'home/products_page/formats/sticky_header_footer.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Sticky Header/Footer" %}
+                                    {% include 'home/products_page/formats/sticky_header_footer.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Tabbed Interface" %}
-                                {% include 'home/products_page/formats/tabbed_interface.html.twig' %}
-                            {% endif %}
+                                {% if cms_copy.getPageLayout.name  == "Tabbed Interface" %}
+                                    {% include 'home/products_page/formats/tabbed_interface.html.twig' %}
+                                {% endif %}
 
-                            {% if cms_copy.getPageLayout.name  == "Timeline Layout" %}
-                                {% include 'home/products_page/formats/timeline_layout.html.twig' %}
+                                {% if cms_copy.getPageLayout.name  == "Timeline Layout" %}
+                                    {% include 'home/products_page/formats/timeline_layout.html.twig' %}
+                                {% endif %}
                             {% endif %}
 
                         {% endfor %}

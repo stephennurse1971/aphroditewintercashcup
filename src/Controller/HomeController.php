@@ -35,10 +35,10 @@ class   HomeController extends AbstractController
         $cms_photo = [];
         $product = [];
         $sub_pages = [];
-        $cms_copy = $cmsCopyRepository->findOneBy([
+        $cms_copy = $cmsCopyRepository->findBy([
             'staticPageName' => 'Home'
         ]);
-        $page_layout=$cms_copy->getPageLayout();
+
 
         $cms_photo = $cmsPhotoRepository->findBy([
             'staticPageName' => 'Home'
@@ -48,6 +48,7 @@ class   HomeController extends AbstractController
             'staticPageName' => 'Home',
             'ranking' => '1',
         ]);
+        $page_layout=$cms_copy_ranking1->getPageLayout();
 
         if ($cms_copy_ranking1) {
             if ($security->getUser()) {
