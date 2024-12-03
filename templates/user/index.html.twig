@@ -150,7 +150,10 @@
                             <a class="btn btn-outline-primary btn-sm"
                                href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 80', id: user.id}) }}">Paid
                                 SN 80</a>
-                            <a class="btn btn-outline-primary btn-sm"
+                            <a class="btn btn-outline-secondary btn-sm"
+                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 50', id: user.id}) }}">Paid
+                                NR 50</a>
+                            <a class="btn btn-outline-secondary btn-sm"
                                href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 100', id: user.id}) }}">Paid
                                 NR 100</a>
                         {% else %}
@@ -195,7 +198,7 @@
                 "order": [[0, 'asc'], [1, 'asc']],
                 "paging": true,
                 "searching": true,
-                "bInfo": false
+                "bInfo": true
             });
         });
     </script>

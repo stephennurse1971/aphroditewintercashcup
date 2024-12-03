@@ -254,11 +254,18 @@ class UserController extends AbstractController
             $manager->flush();
         }
 
-        if ($singles_or_doubles == "Pay NR 100") {
+        if ($singles_or_doubles == "Pay NR 50") {
+            $user->setPaidTo('NR');
+            $user->setPaidAmount('50');
+            $manager->flush();
+        }
+
+          if ($singles_or_doubles == "Pay NR 100") {
             $user->setPaidTo('NR');
             $user->setPaidAmount('100');
             $manager->flush();
         }
+
         if ($singles_or_doubles == "Reset payments") {
             $user->setPaidTo(null);
             $user->setPaidAmount(null);
