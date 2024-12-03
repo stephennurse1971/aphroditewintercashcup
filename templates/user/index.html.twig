@@ -169,24 +169,30 @@
     </table>
     <div class="row">
         <div class="col-3"></div>
-        <div class="col-1">
-            <b>Singles:</b> {{ total_singles }}
-        </div>
-        <div class="col-1">
-            <b>Doubles:</b> {{ total_doubles }}
-        </div>
-        <div class="col-1">
-            <b>Total:</b> <br>
-            <b>Paid:</b> <br>
-            <b>Outstanding:</b> <br>
-            <b>Collected by SN:</b>
-        </div>
-        <div class="col-1">
-            € {{ total_owed|number_format(2, '.', ',') }}<br>
-            <u> € {{ total_paid|number_format(2, '.', ',') }}</u><br>
-            € {{ (total_owed - total_paid)|number_format(2, '.', ',') }}<br>
-            € {{ total_paid_to_SN|number_format(2, '.', ',') }}
-        </div>
+        {% if title == 'All' or title == 'Singles' %}
+            <div class="col-1">
+                <b>Singles:</b> {{ total_singles }}
+            </div>
+        {% endif %}
+        {% if title =='All' or  title == 'Doubles' or title == 'Doubles - Unmatched' %}
+            <div class="col-1">
+                <b>Doubles:</b> {{ total_doubles }}
+            </div>
+        {% endif %}
+        {% if title == 'All' %}
+            <div class="col-1">
+                <b>Total:</b> <br>
+                <b>Paid:</b> <br>
+                <b>Outstanding:</b> <br>
+                <b>Collected by SN:</b>
+            </div>
+            <div class="col-1">
+                € {{ total_owed|number_format(2, '.', ',') }}<br>
+                <u> € {{ total_paid|number_format(2, '.', ',') }}</u><br>
+                € {{ (total_owed - total_paid)|number_format(2, '.', ',') }}<br>
+                € {{ total_paid_to_SN|number_format(2, '.', ',') }}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 
