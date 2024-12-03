@@ -35,9 +35,10 @@ class   HomeController extends AbstractController
         $cms_photo = [];
         $product = [];
         $sub_pages = [];
-        $cms_copy = $cmsCopyRepository->findBy([
+        $cms_copy = $cmsCopyRepository->findOneBy([
             'staticPageName' => 'Home'
         ]);
+        $page_layout=$cms_copy->getPageLayout();
 
         $cms_photo = $cmsPhotoRepository->findBy([
             'staticPageName' => 'Home'
@@ -71,7 +72,8 @@ class   HomeController extends AbstractController
                 'cms_photo_array' => $cms_photo,
                 'sub_pages' => $sub_pages,
                 'include_contact' => 'Yes',
-                'include_QR_code' => $qrcode
+                'include_QR_code' => $qrcode,
+                'format'=>$page_layout
             ]);
         }
     }

@@ -41,12 +41,10 @@ class ImportUserService
             $firstName = trim($oneLineFromCsv[0]);
             $lastName = trim($oneLineFromCsv[1]);
             $email = trim(strtolower($oneLineFromCsv[2]));
-            $mobile = trim($oneLineFromCsv[3]);
-            $verified_email =true;
+//            $mobile = trim(strtolower($oneLineFromCsv[3]));
 
             if (!$email) {
                 $email = $firstName . $lastName . "NoEmail@no_email.com";
-                $verified_email = false;
             }
 
             $old_user = $this->userRepository->findOneBy(['email' => $email]);
@@ -58,10 +56,10 @@ class ImportUserService
                 $new_user->setEmail($email)
                     ->setFirstName($firstName)
                     ->setLastName($lastName)
-                    ->setMobile($mobile)
+//                    ->setMobile($mobile)
                     ->setRoles(['ROLE_USER'])
                     ->setPassword('password')
-                    ->setEmailVerified($verified_email);
+                    ->setEmailVerified(true);
                 $this->manager->persist($new_user);
                 $this->manager->flush();
             }
