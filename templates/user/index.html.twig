@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Users
+    Users: {{ title }}
 {% endblock %}
 
 {% block body %}
-    <h1 style="color: red">Users</h1>
+    <h1 style="color: red">Users: {{ title }}</h1>
     {% include 'user/parts/delete_and_import_and_export_buttons.html.twig' %}
     <table class="table table-responsive">
         <thead>

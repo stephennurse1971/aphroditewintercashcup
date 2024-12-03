@@ -43,10 +43,73 @@ class UserController extends AbstractController
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
+            'title'=>'All',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
     }
+
+
+    /**
+     * @Route("/index/singles", name="user_index_singles", methods={"GET"})
+     * @Security("is_granted('ROLE_STAFF')")
+     */
+    public function indexSingles(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
+    {
+        $now = new \DateTime('now');
+        $users = $userRepository->findBy([
+            'playingSingles'=>1
+        ]);
+
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+            'title'=>'Singles',
+            'services' => $servicesOfferedRepository->findAll(),
+            'now' => $now
+        ]);
+    }
+
+    /**
+     * @Route("/index/doubles", name="user_index_doubles", methods={"GET"})
+     * @Security("is_granted('ROLE_STAFF')")
+     */
+    public function indexDoubles(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
+    {
+        $now = new \DateTime('now');
+        $users = $userRepository->findBy([
+            'playingDoubles'=>1
+        ]);
+
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+            'title'=>'Doubles',
+            'services' => $servicesOfferedRepository->findAll(),
+            'now' => $now
+        ]);
+    }
+
+
+    /**
+     * @Route("/index/doubles_unmatched", name="user_index-doubles_unmatched", methods={"GET"})
+     * @Security("is_granted('ROLE_STAFF')")
+     */
+    public function indexDoublesUnMatched(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
+    {
+        $now = new \DateTime('now');
+        $users = $userRepository->findBy([
+            'playingDoubles'=>1,
+            'doublesPartner'=>null
+        ]);
+
+
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+            'title'=>'Doubles - Unmatched',
+            'services' => $servicesOfferedRepository->findAll(),
+            'now' => $now
+        ]);
+    }
+
 
 
     /**
@@ -271,9 +334,6 @@ class UserController extends AbstractController
             $user->setPaidAmount(null);
             $manager->flush();
         }
-
-
-
 
         return $this->redirect($referer);
     }
