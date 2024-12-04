@@ -258,6 +258,4 @@ class   HomeController extends AbstractController
             'qr_code' => $qr_code,
         ]);
     }
-
-
 }

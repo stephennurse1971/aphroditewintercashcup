@@ -38,7 +38,9 @@
                         {% for cms_copy in cms_copy_array|sort((a, b) => a.ranking <=> b.ranking) %}
 
                             {% if cms_copy.pageLayout is not null %}
-                                <b>{{ cms_copy.getPageLayout.name }}</b>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <span style="color: red"><b>{{ cms_copy.getPageLayout.name }}</b></span>
+                                    {% endif %}
 
                                 {% if cms_copy.getPageLayout.name  == "Accordion" %}
                                     {% include 'home/products_page/formats/accordion.html.twig' %}
