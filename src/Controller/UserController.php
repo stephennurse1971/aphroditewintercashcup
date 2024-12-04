@@ -43,7 +43,7 @@ class UserController extends AbstractController
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
-            'title'=>'All',
+            'title' => 'All',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
@@ -58,12 +58,12 @@ class UserController extends AbstractController
     {
         $now = new \DateTime('now');
         $users = $userRepository->findBy([
-            'playingSingles'=>1
+            'playingSingles' => 1
         ]);
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
-            'title'=>'Singles',
+            'title' => 'Singles',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
@@ -77,12 +77,12 @@ class UserController extends AbstractController
     {
         $now = new \DateTime('now');
         $users = $userRepository->findBy([
-            'playingDoubles'=>1
+            'playingDoubles' => 1
         ]);
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
-            'title'=>'Doubles',
+            'title' => 'Doubles',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
@@ -97,19 +97,18 @@ class UserController extends AbstractController
     {
         $now = new \DateTime('now');
         $users = $userRepository->findBy([
-            'playingDoubles'=>1,
-            'doublesPartner'=>null
+            'playingDoubles' => 1,
+            'doublesPartner' => null
         ]);
 
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
-            'title'=>'Doubles - Unmatched',
+            'title' => 'Doubles - Unmatched',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
     }
-
 
 
     /**
@@ -180,12 +179,7 @@ class UserController extends AbstractController
                 $roles = $form['roles']->getData();
                 $user->setRoles($roles);
             }
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $user->getPassword()
-                )
-            );
+            $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
             $userRepository->add($user, true);
             return $this->redirect($referer);
         }
@@ -306,9 +300,9 @@ class UserController extends AbstractController
         }
 
         if ($singles_or_doubles == "Pay SN 50") {
-                $user->setPaidTo('SN');
-                $user->setPaidAmount('50');
-                $manager->flush();
+            $user->setPaidTo('SN');
+            $user->setPaidAmount('50');
+            $manager->flush();
         }
 
         if ($singles_or_doubles == "Pay SN 80") {
@@ -323,7 +317,7 @@ class UserController extends AbstractController
             $manager->flush();
         }
 
-          if ($singles_or_doubles == "Pay NR 100") {
+        if ($singles_or_doubles == "Pay NR 100") {
             $user->setPaidTo('NR');
             $user->setPaidAmount('100');
             $manager->flush();

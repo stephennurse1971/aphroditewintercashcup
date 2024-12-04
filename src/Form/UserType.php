@@ -39,6 +39,10 @@ class UserType extends AbstractType
             ])
             ->add('paidAmount')
             ->add('paidTo')
+            ->add('paymentDate', DateType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('comments')
             ->add('roles', ChoiceType::class, [
                     'mapped' => true,
                     'multiple' => true,

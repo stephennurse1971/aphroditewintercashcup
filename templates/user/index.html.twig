@@ -21,6 +21,8 @@
             <th>Owed</th>
             <th>Paid<br>Amount</th>
             <th>Paid<br>To</th>
+            <th>Payment Date</th>
+            <th>Comments</th>
             <th style="border-right: 1px dotted">Outstanding</th>
             <th>#</th>
             <th>#</th>
@@ -125,6 +127,12 @@
                         {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
                     {% endif %}
                 </td>
+                <td data-sort="{{ user.paymentDate|date('y-m-d') }}">
+                    {% if user.paymentDate is not null %}
+                        {{ user.paymentDate|date('d-M-y') }}
+                    {% endif %}
+                </td>
+                <td>{{ user.comments }}</td>
                 <td style="text-align: right; border-right: 1px dotted">
                     {% set outstanding_by_player = owed_by_player - user.paidAmount %}
                     {% if outstanding_by_player !=0 %}

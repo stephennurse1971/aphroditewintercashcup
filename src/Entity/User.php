@@ -85,6 +85,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $doublesPartner;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $paymentDate;
+
 
 
     public function getId(): ?int
@@ -284,6 +294,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDoublesPartner(?self $doublesPartner): self
     {
         $this->doublesPartner = $doublesPartner;
+
+        return $this;
+    }
+
+    public function getComments(): ?string
+    {
+        return $this->comments;
+    }
+
+    public function setComments(?string $comments): self
+    {
+        $this->comments = $comments;
+
+        return $this;
+    }
+
+    public function getPaymentDate(): ?\DateTimeInterface
+    {
+        return $this->paymentDate;
+    }
+
+    public function setPaymentDate(?\DateTimeInterface $paymentDate): self
+    {
+        $this->paymentDate = $paymentDate;
 
         return $this;
     }
