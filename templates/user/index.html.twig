@@ -202,14 +202,14 @@
                 <b>Owed:</b> <br>
                 <b>Paid:</b> <br>
                 <b>Outstanding:</b> <br>
-                <b>Collected by SN:</b>
+                <b>Collected by SN:</b><br>
                 <b>Collected by NR:</b>
             </div>
             <div class="col-1">
                 € {{ total_owed|number_format(2, '.', ',') }}<br>
                 <u> € {{ total_paid|number_format(2, '.', ',') }}</u><br>
                 € {{ (total_owed - total_paid)|number_format(2, '.', ',') }}<br>
-                € {{ total_paid_to_SN|number_format(2, '.', ',') }}
+                € {{ total_paid_to_SN|number_format(2, '.', ',') }}<br>
                 € {{ total_paid_to_NR|number_format(2, '.', ',') }}
             </div>
         {% endif %}
