@@ -127,7 +127,6 @@
                         {% set owed_by_player = owed_by_player -user.subsidy %}
                     {% endif %}
 
-
                     {% if owed_by_player >0 %}
                         {{ owed_by_player|number_format(0, '.', ',') }}
                     {% endif %}
