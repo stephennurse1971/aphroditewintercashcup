@@ -132,7 +132,7 @@
                         {% set owed_by_player = owed_by_player -user.subsidy %}
                     {% endif %}
 
-                    {% if owed_by_player >0 %}
+                    {% if owed_by_player !=0 %}
                         {{ owed_by_player|number_format(0, '.', ',') }}
                     {% endif %}
 
@@ -180,7 +180,7 @@
                 <td>
                     {% if is_granted('ROLE_ADMIN') %}
                         {% if user.playingSingles is not null or user.playingDoubles is not null %}
-                            {% if user.paidAmount < 1 %}
+                            {% if outstanding_by_player !=0 %}
                                 <a class="btn btn-outline-primary btn-sm"
                                    href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 50', id: user.id}) }}">Paid
                                     SN 50</a>
