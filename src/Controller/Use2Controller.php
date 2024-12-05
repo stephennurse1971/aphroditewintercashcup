@@ -72,7 +72,7 @@ class Use2Controller extends AbstractController
 
 
     /**
-     * @Route("/index/doubles_unmatched", name="user_index-doubles_unmatched", methods={"GET"})
+     * @Route("/index/doubles_unmatched", name="user_index_doubles_unmatched", methods={"GET"})
      * @Security("is_granted('ROLE_STAFF')")
      */
     public function indexDoublesUnMatched(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
@@ -87,6 +87,26 @@ class Use2Controller extends AbstractController
         return $this->render('user/index.html.twig', [
             'users' => $users,
             'title' => 'Doubles - Unmatched',
+            'services' => $servicesOfferedRepository->findAll(),
+            'now' => $now
+        ]);
+    }
+
+    /**
+     * @Route("/index/not_paid", name="user_index_not_paid", methods={"GET"})
+     * @Security("is_granted('ROLE_STAFF')")
+     */
+    public function indexNotPaid(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
+    {
+        $now = new \DateTime('now');
+        $users = $userRepository->findBy([
+            'paidAmount' => null,
+        ]);
+
+
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+            'title' => 'Not Paid',
             'services' => $servicesOfferedRepository->findAll(),
             'now' => $now
         ]);
