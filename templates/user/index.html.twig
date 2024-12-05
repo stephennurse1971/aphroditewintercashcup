@@ -35,6 +35,7 @@
         {% set total_paid =0 %}
 
         {% set total_paid_to_SN =0 %}
+        {% set total_paid_to_NR =0 %}
         </thead>
         <tbody>
         {% for user in users %}
@@ -132,6 +133,9 @@
                     {% if user.paidTo =="SN" %}
                         {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
                     {% endif %}
+                    {% if user.paidTo =="NR" %}
+                        {% set total_paid_to_NR = total_paid_to_NR+ user.paidAmount %}
+                    {% endif %}
                 </td>
                 <td data-sort="{{ user.paymentDate|date('y-m-d') }}">
                     {% if user.paymentDate is not null %}
@@ -199,12 +203,14 @@
                 <b>Paid:</b> <br>
                 <b>Outstanding:</b> <br>
                 <b>Collected by SN:</b>
+                <b>Collected by NR:</b>
             </div>
             <div class="col-1">
                 € {{ total_owed|number_format(2, '.', ',') }}<br>
                 <u> € {{ total_paid|number_format(2, '.', ',') }}</u><br>
                 € {{ (total_owed - total_paid)|number_format(2, '.', ',') }}<br>
                 € {{ total_paid_to_SN|number_format(2, '.', ',') }}
+                € {{ total_paid_to_NR|number_format(2, '.', ',') }}
             </div>
         {% endif %}
     </div>
