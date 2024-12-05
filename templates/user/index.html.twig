@@ -10,22 +10,22 @@
     <table class="table table-responsive">
         <thead>
         <tr>
-            <th>First Name</th>
+            <th style="width: 95px">First Name</th>
             <th>Last Name</th>
-            <th>Email</th>
-            <th style="width: 150px">Mobile</th>
+            <th style="width: 350px">Email</th>
+            <th style="width: 180px">Mobile</th>
             <th style="border-right: 1px dotted">Roles</th>
             <th style="border-right: 1px dotted">Free<br>Entry</th>
             <th>Playing<br>Singles</th>
             <th>Playing<br>Doubles</th>
-            <th style="border-right: 1px dotted">Doubles<br>Partner</th>
+            <th style="border-right: 1px dotted;width: 150px">Doubles<br>Partner</th>
             <th>Subsidy</th>
             <th>Owed</th>
             <th>Paid<br>Amount</th>
             <th style="border-right: 1px dotted">Outstanding</th>
             <th style="text-align: right">Paid<br>To</th>
             <th style="text-align: right">Payment<br>Date</th>
-            <th style="border-right: 1px dotted">Comments</th>
+            <th style="border-right: 1px dotted; width: 150px">Comments</th>
             <th>#</th>
             <th>#</th>
             <th style="width: 600px">#</th>
@@ -165,7 +165,12 @@
                         {{ user.paymentDate|date('d-M-y') }}
                     {% endif %}
                 </td>
-                <td style="border-right: 1px dotted">{{ user.comments }}</td>
+                <td style="border-right: 1px dotted">
+                    {% if user.comments|length >15 %}
+                        <i title="{{ user.comments }}" style="color: blue" class="fa fa-info-circle"></i>
+                    {% endif %}
+                    {{ user.comments|slice(0,15) }}
+                </td>
 
                 <td>
                     <a class="btn btn-outline-danger btn-sm"
@@ -194,9 +199,11 @@
                                    href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 100', id: user.id}) }}">Paid
                                     NR 100</a>
                             {% else %}
-                                <a class="btn btn-outline-primary btn-sm"
-                                   href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Reset payments', id: user.id}) }}">Reset
-                                    payments</a>
+                                {% if user.freeEntry !=1 %}
+                                    <a class="btn btn-outline-primary btn-sm"
+                                       href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Reset payments', id: user.id}) }}">Reset
+                                        payments</a>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
