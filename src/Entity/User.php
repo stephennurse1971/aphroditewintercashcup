@@ -100,6 +100,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $freeEntry;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $subsidy;
+
 
 
     public function getId(): ?int
@@ -335,6 +340,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFreeEntry(?bool $freeEntry): self
     {
         $this->freeEntry = $freeEntry;
+
+        return $this;
+    }
+
+    public function getSubsidy(): ?int
+    {
+        return $this->subsidy;
+    }
+
+    public function setSubsidy(?int $subsidy): self
+    {
+        $this->subsidy = $subsidy;
 
         return $this;
     }

@@ -41,7 +41,7 @@ class ImportUserService
             $firstName = trim($oneLineFromCsv[0]);
             $lastName = trim($oneLineFromCsv[1]);
             $email = trim(strtolower($oneLineFromCsv[2]));
-//            $mobile = trim(strtolower($oneLineFromCsv[3]));
+            $mobile = trim($oneLineFromCsv[3]);
 
             if (!$email) {
                 $email = $firstName . $lastName . "NoEmail@no_email.com";
@@ -51,12 +51,13 @@ class ImportUserService
             if ($old_user) {
                 $old_user->setFirstName($firstName);
                 $old_user->setLastName($lastName);
+                $old_user->setMobile($mobile);
             } else {
                 $new_user = new User();
                 $new_user->setEmail($email)
                     ->setFirstName($firstName)
                     ->setLastName($lastName)
-//                    ->setMobile($mobile)
+                    ->setMobile($mobile)
                     ->setRoles(['ROLE_USER'])
                     ->setPassword('password')
                     ->setEmailVerified(true);

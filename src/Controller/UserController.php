@@ -102,6 +102,9 @@ class UserController extends AbstractController
      */
     public function edit(Request $request, string $fullName, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, \Symfony\Component\Security\Core\Security $security): Response
     {
+//        dd($request);
+
+
         $user_name = explode(' ', $fullName);
         if (count($user_name) < 3) {
             $first_name = $user_name[0];
@@ -113,7 +116,6 @@ class UserController extends AbstractController
         $user = $userRepository->findOneBy([
             'firstName' => $first_name,
             'lastName' => $last_name]);
-
         $form = $this->createForm(UserType::class, $user, ['user' => $user]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -122,16 +124,18 @@ class UserController extends AbstractController
                 $roles = $form['roles']->getData();
                 $user->setRoles($roles);
             }
-            $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
+//            dump($request->request->password);
+//            dd($request);
+            if(isset($request->request->password) && $request->request->password != null){
+                $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
+            }
             $userRepository->add($user, true);
             return $this->redirect($referer);
         }
-
         return $this->renderForm('user/edit.html.twig', [
             'user' => $user,
             'form' => $form,
         ]);
-
     }
 
     /**
