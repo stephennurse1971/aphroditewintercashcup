@@ -42,6 +42,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
     }
 
+    public function findUsersWithNonZeroPaidAmount()
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.paidAmount != 0')
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */

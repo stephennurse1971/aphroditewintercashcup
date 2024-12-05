@@ -112,6 +112,22 @@ class Use2Controller extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/index/paid", name="user_index_paid", methods={"GET"})
+     * @Security("is_granted('ROLE_STAFF')")
+     */
+    public function indexPaid(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
+    {
+        $now = new \DateTime('now');
+        $users = $userRepository->findUsersWithNonZeroPaidAmount();
+
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+            'title' => 'Paid',
+            'services' => $servicesOfferedRepository->findAll(),
+            'now' => $now
+        ]);
+    }
 
     /**
      * @Route("/change_playing_singles_or_doubles/{singles_or_doubles}/{id}", name="change_playing_singles_or_doubles", methods={"GET", "POST"})
