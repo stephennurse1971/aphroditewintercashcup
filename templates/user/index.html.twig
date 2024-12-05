@@ -108,10 +108,15 @@
                 <td style="text-align: right; border-right: 1px dotted">
                     {% if user.doublesPartner is not null %}
                         {{ user.doublesPartner.fullName }}
+                        {% if user.doublesPartner.playingDoubles == 1 %}
+                            <i style="color: green" class="fa fa-check"> </i>
+                        {% else %}
+                            <i style="background-color: yellow; color: red" class="fa fa-warning"> </i>
+                        {% endif %}
                     {% endif %}
                 </td>
                 <td style="text-align: right">
-                    {{ user.subsidy  }}
+                    {{ user.subsidy }}
                 </td>
                 <td style="text-align: right">
                     {% if user.playingSingles ==1 and user.freeEntry !=1 %}
