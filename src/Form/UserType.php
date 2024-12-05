@@ -30,6 +30,7 @@ class UserType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('mobile')
+            ->add('freeEntry')
             ->add('playingSingles')
             ->add('playingDoubles')
             ->add('doublesPartner',EntityType::class,[
@@ -41,6 +42,7 @@ class UserType extends AbstractType
             ->add('paidTo')
             ->add('paymentDate', DateType::class, [
                 'widget' => 'single_text',
+                'required' => false,
             ])
             ->add('comments')
             ->add('roles', ChoiceType::class, [

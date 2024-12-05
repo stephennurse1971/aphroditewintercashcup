@@ -95,6 +95,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $paymentDate;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $freeEntry;
+
 
 
     public function getId(): ?int
@@ -318,6 +323,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPaymentDate(?\DateTimeInterface $paymentDate): self
     {
         $this->paymentDate = $paymentDate;
+
+        return $this;
+    }
+
+    public function isFreeEntry(): ?bool
+    {
+        return $this->freeEntry;
+    }
+
+    public function setFreeEntry(?bool $freeEntry): self
+    {
+        $this->freeEntry = $freeEntry;
 
         return $this;
     }

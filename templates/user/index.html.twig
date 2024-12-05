@@ -15,6 +15,7 @@
             <th>Email</th>
             <th>Mobile</th>
             <th style="border-right: 1px dotted">Roles</th>
+            <th style="border-right: 1px dotted">Free</th>
             <th>Playing<br>Singles</th>
             <th>Playing<br>Doubles</th>
             <th style="border-right: 1px dotted">Doubles<br>Partner</th>
@@ -72,6 +73,11 @@
                         {% endif %}
                     {% endfor %}
                 </td>
+                <td data-sort="{{ user.FreeEntry }}" style="text-align: center; border-right: 1px dotted">
+                    {% if user.FreeEntry ==1 %}
+                        <i class="fa fa-warning"></i>
+                    {% endif %}
+                </td>
 
                 <td style="text-align: center">
                     {% if user.playingSingles ==1 %}
@@ -99,13 +105,13 @@
                     {% endif %}
                 </td>
                 <td style="text-align: right">
-                    {% if user.playingSingles == 1 %}
+                    {% if user.playingSingles ==1 and user.freeEntry !=1  %}
                         {% set owed_by_player = 50 %}
                     {% endif %}
-                    {% if user.playingDoubles == 1 %}
+                    {% if user.playingDoubles == 1 and user.freeEntry !=1 %}
                         {% set owed_by_player = owed_by_player + 50 %}
                     {% endif %}
-                    {% if user.playingDoubles == 1 and user.playingSingles ==1 %}
+                    {% if user.playingDoubles == 1 and user.playingSingles ==1 and user.freeEntry !=1 %}
                         {% set owed_by_player = owed_by_player -20 %}
                     {% endif %}
                     {% if owed_by_player >0 %}
@@ -189,7 +195,7 @@
         {% endif %}
         {% if title == 'All' %}
             <div class="col-1">
-                <b>Total:</b> <br>
+                <b>Owed:</b> <br>
                 <b>Paid:</b> <br>
                 <b>Outstanding:</b> <br>
                 <b>Collected by SN:</b>
