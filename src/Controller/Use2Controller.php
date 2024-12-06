@@ -101,6 +101,7 @@ class Use2Controller extends AbstractController
         $now = new \DateTime('now');
         $users = $userRepository->findBy([
             'paidAmount' => null,
+            'freeEntry'=>null,
         ]);
 
 
