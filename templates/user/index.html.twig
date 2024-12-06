@@ -42,6 +42,24 @@
         {% for user in users %}
 
             {% set owed_by_player =0 %}
+            {% if user.playingSingles ==1 and user.freeEntry !=1 %}
+                {% set owed_by_player = 50 %}
+            {% endif %}
+            {% if user.playingDoubles == 1 and user.freeEntry !=1 %}
+                {% set owed_by_player = owed_by_player + 50 %}
+            {% endif %}
+            {% if user.playingDoubles == 1 and user.playingSingles ==1 and user.freeEntry !=1 %}
+                {% set owed_by_player = owed_by_player -20 %}
+            {% endif %}
+            {% if user.subsidy != 0 %}
+                {% set owed_by_player = owed_by_player -user.subsidy %}
+            {% endif %}
+
+            {% set outstanding_by_player = owed_by_player - user.paidAmount %}
+
+            {% set total_owed = total_owed + owed_by_player %}
+
+            {% if (title == "Not Paid" and outstanding_by_player != 0)  or (title != "Not Paid" and 1==1 )  %}
             <tr>
                 <td>
                     <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
@@ -120,24 +138,9 @@
                     {{ user.subsidy }}
                 </td>
                 <td style="text-align: right">
-                    {% if user.playingSingles ==1 and user.freeEntry !=1 %}
-                        {% set owed_by_player = 50 %}
-                    {% endif %}
-                    {% if user.playingDoubles == 1 and user.freeEntry !=1 %}
-                        {% set owed_by_player = owed_by_player + 50 %}
-                    {% endif %}
-                    {% if user.playingDoubles == 1 and user.playingSingles ==1 and user.freeEntry !=1 %}
-                        {% set owed_by_player = owed_by_player -20 %}
-                    {% endif %}
-                    {% if user.subsidy != 0 %}
-                        {% set owed_by_player = owed_by_player -user.subsidy %}
-                    {% endif %}
-
                     {% if owed_by_player !=0 %}
                         {{ owed_by_player|number_format(0, '.', ',') }}
                     {% endif %}
-
-                    {% set total_owed = total_owed + owed_by_player %}
                 </td>
 
                 <td style="text-align: right">
@@ -147,7 +150,7 @@
                     {% set total_paid = total_paid + user.paidAmount %}
                 </td>
                 <td style="text-align: right; border-right: 1px dotted">
-                    {% set outstanding_by_player = owed_by_player - user.paidAmount %}
+
                     {% if outstanding_by_player !=0 %}
                         {{ outstanding_by_player|number_format(0, '.', ',') }}
                     {% endif %}
@@ -212,6 +215,7 @@
                     {% endif %}
                 </td>
             </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>

@@ -99,11 +99,7 @@ class Use2Controller extends AbstractController
     public function indexNotPaid(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
     {
         $now = new \DateTime('now');
-        $users = $userRepository->findBy([
-            'paidAmount' => null,
-            'freeEntry'=>null,
-        ]);
-
+        $users = $userRepository->findAll();
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
