@@ -12,23 +12,34 @@
         <tr>
             <th style="width: 95px">First Name</th>
             <th>Last Name</th>
-            <th style="width: 350px">Email</th>
-            <th style="width: 180px">Mobile</th>
-            <th style="border-right: 1px dotted">Roles</th>
-            <th style="border-right: 1px dotted">Free<br>Entry</th>
-            <th>Playing<br>Singles</th>
-            <th>Playing<br>Doubles</th>
-            <th style="border-right: 1px dotted;width: 150px">Doubles<br>Partner</th>
-            <th>Subsidy</th>
-            <th>Owed</th>
-            <th>Paid<br>Amount</th>
-            <th style="border-right: 1px dotted">Outstanding</th>
-            <th style="text-align: right">Paid<br>To</th>
-            <th style="text-align: right">Payment<br>Date</th>
-            <th style="border-right: 1px dotted; width: 150px">Comments</th>
-            <th>#</th>
-            <th>#</th>
-            <th style="width: 600px">#</th>
+            {% if is_granted('ROLE_ADMIN') %}
+                <th style="width: 350px; color: red">Email</th>
+                <th style="width: 180px; color:red">Mobile</th>
+                <th style="border-right: 1px dotted">Roles</th>
+                <th style="border-right: 1px dotted; color: red">Free<br>Entry</th>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') or title=='Singles' %}
+                <th>Playing<br>Singles</th>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') or title=='Doubles' %}
+                <th>Playing<br>Doubles</th>
+                <th style="border-right: 1px dotted;width: 150px">Doubles<br>Partner</th>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <th style="color: red">Subsidy</th>
+                <th style="color: red">Owed</th>
+                <th style="color: red">Paid<br>Amount</th>
+                <th style="border-right: 1px dotted;color: red">Outstanding</th>
+                <th style="text-align: right;color: red">Paid<br>To</th>
+                <th style="text-align: right;color: red">Payment<br>Date</th>
+                <th style="border-right: 1px dotted; width: 150px;color: red">Comments</th>
+                <th style="color: red">#</th>
+                <th style="color: red">#</th>
+                <th style="width: 600px; color: red">#</th>
+            {% endif %}
         </tr>
         {% set total_singles = 0 %}
         {% set total_doubles = 0 %}
@@ -59,162 +70,180 @@
 
             {% set total_owed = total_owed + owed_by_player %}
 
-            {% if (title == "Not Paid" and outstanding_by_player != 0)  or (title != "Not Paid" and 1==1 )  %}
-            <tr>
-                <td>
-                    <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
-                </td>
-                <td>
-                    <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
-                </td>
-                <td>
-                    {% if user.emailVerified == 1 %}
-                        <i style="color: green" class="fa fa-check"></i>
-                    {% else %}
-                        <i style="color: red" class="fa fa-remove"></i>
-                    {% endif %}
-                    {% if user.email == (user.firstName ~ user.lastName ~ 'NoEmail@no_email.com') %}
-                        <span style="background-color: yellow">
+            {% if (title == "Not Paid" and outstanding_by_player != 0)  or (title != "Not Paid" and 1==1 ) %}
+                <tr>
+                    <td>
+                        <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
+                    </td>
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td> *
+                            {% if user.emailVerified == 1 %}
+                                <i style="color: green" class="fa fa-check"></i>
+                            {% else %}
+                                <i style="color: red" class="fa fa-remove"></i>
+                            {% endif %}
+                            {% if user.email == (user.firstName ~ user.lastName ~ 'NoEmail@no_email.com') %}
+                                <span style="background-color: yellow">
                     {{ user.email }}
                 </span>
-                    {% else %}
-                        <a href="mailto:{{ user.email }}">
-                            <i class="fas fa-envelope"> </i></a>
-                        {{ user.email }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if user.mobile is not empty %}
-                        <a target="_blank"
-                           href="https://wa.me/{{ user.mobile|replace({' ': ''}) }}">
-                            <i class="fab fa-whatsapp" style="color:green; text-align: center"></i></a>
-                        {{ user.mobile }}
-                    {% endif %}
-                </td>
-                <td style="text-align: center; border-right: 1px dotted">
-                    {% for role in user.roles %}
-                        {% if role == 'ROLE_ADMIN' %}
-                            <i title="ROLE_ADMIN" style="color: red" class="fa fa-hat-wizard"></i>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <td data-sort="{{ user.FreeEntry }}" style="text-align: center; border-right: 1px dotted">
-                    {% if user.FreeEntry ==1 %}
-                        <i style="background-color: yellow; color: red" class="fas fa-ticket"></i>
-                    {% endif %}
-                </td>
-
-                <td style="text-align: center">
-                    {% if user.playingSingles ==1 %}
-                        <i style="color: green" class="fa fa-user"></i>
-                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">-</a>
-                        {% set total_singles = total_singles+1 %}
-                    {% else %}
-                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">+</a>
-                    {% endif %}
-                </td>
-
-                <td style="text-align: center">
-                    {% if user.playingDoubles ==1 %}
-                        <i style="color: blue" class="fa fa-user-friends"></i>
-                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">-</a>
-
-                        {% set total_doubles = total_doubles +1 %}
-                    {% else %}
-                        <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">+</a>
-                    {% endif %}
-                </td>
-                <td style="text-align: right; border-right: 1px dotted">
-                    {% if user.doublesPartner is not null %}
-                        {{ user.doublesPartner.fullName }}
-                        {% if user.doublesPartner.playingDoubles == 1 %}
-                            <i style="color: green" class="fa fa-check"> </i>
-                        {% else %}
-                            <i style="background-color: yellow; color: red" class="fa fa-warning"> </i>
-                        {% endif %}
-                    {% endif %}
-                </td>
-                <td style="text-align: right">
-                    {{ user.subsidy }}
-                </td>
-                <td style="text-align: right">
-                    {% if owed_by_player !=0 %}
-                        {{ owed_by_player|number_format(0, '.', ',') }}
-                    {% endif %}
-                </td>
-
-                <td style="text-align: right">
-                    {% if user.paidAmount >0 %}
-                        {{ user.paidAmount |number_format(0, '.', ',') }}
-                    {% endif %}
-                    {% set total_paid = total_paid + user.paidAmount %}
-                </td>
-                <td style="text-align: right; border-right: 1px dotted">
-
-                    {% if outstanding_by_player !=0 %}
-                        {{ outstanding_by_player|number_format(0, '.', ',') }}
-                    {% endif %}
-                </td>
-                <td style="text-align: right">
-                    {{ user.paidTo }}
-                    {% if user.paidTo =="SN" %}
-                        {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
-                    {% endif %}
-                    {% if user.paidTo =="NR" %}
-                        {% set total_paid_to_NR = total_paid_to_NR+ user.paidAmount %}
-                    {% endif %}
-                </td>
-                <td data-sort="{{ user.paymentDate|date('y-m-d') }}">
-                    {% if user.paymentDate is not null %}
-                        {{ user.paymentDate|date('d-M-y') }}
-                    {% endif %}
-                </td>
-                <td style="border-right: 1px dotted">
-                    {% if user.comments|length >35 %}
-                        <i title="{{ user.comments }}" style="color: blue" class="fa fa-info-circle"></i>
-                    {% endif %}
-                    {{ user.comments|slice(0,35) }}
-                </td>
-
-                <td>
-                    <a class="btn btn-outline-danger btn-sm"
-                       href="{{ path('user_edit', {fullName:user.fullName}) }}">Edit</a>
-                </td>
-                <td>
-                    <form method="post" action="{{ path('user_delete', {'id': user.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                </td>
-                <td>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        {% if user.playingSingles is not null or user.playingDoubles is not null %}
-                            {% if outstanding_by_player !=0 %}
-                                <a class="btn btn-outline-primary btn-sm"
-                                   href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 50', id: user.id}) }}">Paid
-                                    SN 50</a>
-                                <a class="btn btn-outline-primary btn-sm"
-                                   href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 80', id: user.id}) }}">Paid
-                                    SN 80</a>
-                                <a class="btn btn-outline-secondary btn-sm"
-                                   href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 50', id: user.id}) }}">Paid
-                                    NR 50</a>
-                                <a class="btn btn-outline-secondary btn-sm"
-                                   href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 100', id: user.id}) }}">Paid
-                                    NR 100</a>
                             {% else %}
-                                {% if user.freeEntry !=1 %}
-                                    <a class="btn btn-outline-primary btn-sm"
-                                       href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Reset payments', id: user.id}) }}">
-                                        <i title="Reset payments" class="fa fa-recycle"></i>
+                                <a href="mailto:{{ user.email }}">
+                                    <i class="fas fa-envelope"> </i></a>
+                                {{ user.email }}
+                            {% endif %}
+                        </td>
+                        <td> *
+                            {% if user.mobile is not empty %}
+                                <a target="_blank"
+                                   href="https://wa.me/{{ user.mobile|replace({' ': ''}) }}">
+                                    <i class="fab fa-whatsapp" style="color:green; text-align: center"></i></a>
+                                {{ user.mobile }}
+                            {% endif %}
+                        </td>
 
-                                    </a>
+                        <td style="text-align: center; border-right: 1px dotted">
+                            {% for role in user.roles %}
+                                {% if role == 'ROLE_ADMIN' %}
+                                    <i title="ROLE_ADMIN" style="color: red" class="fa fa-hat-wizard"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+
+                        <td data-sort="{{ user.FreeEntry }}" style="text-align: center; border-right: 1px dotted">
+                            {% if user.FreeEntry ==1 %}
+                                <i style="background-color: yellow; color: red" class="fas fa-ticket"></i>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_ADMIN') or title=='Singles' %}
+                        <td style="text-align: center">
+                            {% if user.playingSingles ==1 %}
+                                <i style="color: green" class="fa fa-user"></i>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">-</a>
+                                {% endif %}
+                                {% set total_singles = total_singles + 1 %}
+                            {% else %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Singles', id: user.id}) }}">+</a>
                                 {% endif %}
                             {% endif %}
-                        {% endif %}
+                        </td>
                     {% endif %}
-                </td>
-            </tr>
+                    {% if is_granted('ROLE_ADMIN') or title=='Doubles' %}
+                        <td style="text-align: center">
+                            {% if user.playingDoubles ==1 %}
+                                <i style="color: blue" class="fa fa-user-friends"></i>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">-</a>
+                                {% endif %}
+                                {% set total_doubles = total_doubles +1 %}
+                            {% else %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Doubles', id: user.id}) }}">+</a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right; border-right: 1px dotted">
+                            {% if user.doublesPartner is not null %}
+                                {{ user.doublesPartner.fullName }}
+                                {% if user.doublesPartner.playingDoubles == 1 %}
+                                    <i style="color: green" class="fa fa-check"> </i>
+                                {% else %}
+                                    <i style="background-color: yellow; color: red" class="fa fa-warning"> </i>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td style="text-align: right">
+                            {{ user.subsidy }}
+                        </td>
+                        <td style="text-align: right">
+                            {% if owed_by_player !=0 %}
+                                {{ owed_by_player|number_format(0, '.', ',') }}
+                            {% endif %}
+                        </td>
+
+                        <td style="text-align: right">
+                            {% if user.paidAmount >0 %}
+                                {{ user.paidAmount |number_format(0, '.', ',') }}
+                            {% endif %}
+                            {% set total_paid = total_paid + user.paidAmount %}
+                        </td>
+                        <td style="text-align: right; border-right: 1px dotted">
+
+                            {% if outstanding_by_player !=0 %}
+                                {{ outstanding_by_player|number_format(0, '.', ',') }}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right">
+                            {{ user.paidTo }}
+                            {% if user.paidTo =="SN" %}
+                                {% set total_paid_to_SN = total_paid_to_SN+ user.paidAmount %}
+                            {% endif %}
+                            {% if user.paidTo =="NR" %}
+                                {% set total_paid_to_NR = total_paid_to_NR+ user.paidAmount %}
+                            {% endif %}
+                        </td>
+                        <td data-sort="{{ user.paymentDate|date('y-m-d') }}">
+                            {% if user.paymentDate is not null %}
+                                {{ user.paymentDate|date('d-M-y') }}
+                            {% endif %}
+                        </td>
+                        <td style="border-right: 1px dotted">
+                            {% if user.comments|length >35 %}
+                                <i title="{{ user.comments }}" style="color: blue" class="fa fa-info-circle"></i>
+                            {% endif %}
+                            {{ user.comments|slice(0,35) }}
+                        </td>
+
+                        <td>
+                            <a class="btn btn-outline-danger btn-sm"
+                               href="{{ path('user_edit', {fullName:user.fullName}) }}">Edit</a>
+                        </td>
+                        <td>
+                            <form method="post" action="{{ path('user_delete', {'id': user.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {% if user.playingSingles is not null or user.playingDoubles is not null %}
+                                    {% if outstanding_by_player !=0 %}
+                                        <a class="btn btn-outline-primary btn-sm"
+                                           href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 50', id: user.id}) }}">Paid
+                                            SN 50</a>
+                                        <a class="btn btn-outline-primary btn-sm"
+                                           href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay SN 80', id: user.id}) }}">Paid
+                                            SN 80</a>
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                           href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 50', id: user.id}) }}">Paid
+                                            NR 50</a>
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                           href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Pay NR 100', id: user.id}) }}">Paid
+                                            NR 100</a>
+                                    {% else %}
+                                        {% if user.freeEntry !=1 %}
+                                            <a class="btn btn-outline-primary btn-sm"
+                                               href="{{ path('change_playing_singles_or_doubles', {singles_or_doubles: 'Reset payments', id: user.id}) }}">
+                                                <i title="Reset payments" class="fa fa-recycle"></i>
+
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
             {% endif %}
         {% endfor %}
         </tbody>

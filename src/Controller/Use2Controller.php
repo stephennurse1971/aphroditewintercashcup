@@ -34,7 +34,7 @@ class Use2Controller extends AbstractController
 {
     /**
      * @Route("/index/singles", name="user_index_singles", methods={"GET"})
-     * @Security("is_granted('ROLE_STAFF')")
+     *
      */
     public function indexSingles(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
     {
@@ -53,7 +53,7 @@ class Use2Controller extends AbstractController
 
     /**
      * @Route("/index/doubles", name="user_index_doubles", methods={"GET"})
-     * @Security("is_granted('ROLE_STAFF')")
+     *
      */
     public function indexDoubles(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
     {
