@@ -73,10 +73,18 @@
             {% if (title == "Not Paid" and outstanding_by_player != 0)  or (title != "Not Paid" and 1==1 ) %}
                 <tr>
                     <td>
-                        <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
+                        {% else %}
+                            {{ user.firstName }}
+                        {% endif %}
                     </td>
                     <td>
-                        <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
+                        {% else %}
+                            {{ user.lastName }}
+                        {% endif %}
                     </td>
 
                     {% if is_granted('ROLE_ADMIN') %}
