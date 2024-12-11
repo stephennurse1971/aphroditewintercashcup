@@ -81,14 +81,16 @@
                 <tr>
                     <td>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <a target="_blank" href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
+                            <a target="_blank"
+                               href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.firstName }}</a>
                         {% else %}
                             {{ user.firstName }}
                         {% endif %}
                     </td>
                     <td>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <a target="_blank" href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
+                            <a target="_blank"
+                               href="{{ path('user_edit', {fullName:user.fullName}) }}"> {{ user.lastName }}</a>
                         {% else %}
                             {{ user.lastName }}
                         {% endif %}
@@ -103,7 +105,7 @@
                                 <i style="color: red" class="fa fa-remove"></i>
                             {% endif %}
                             {% if user.email == (user.firstName ~ user.lastName ~ 'NoEmail@no_email.com') %}
-{#                                <span style="background-color: yellow">{{ user.email }}</span>#}
+                                {#                                <span style="background-color: yellow">{{ user.email }}</span> #}
                             {% else %}
                                 <a href="mailto:{{ user.email }}">
                                     <i title="{{ user.email }}" class="fas fa-envelope"> </i></a>
@@ -171,7 +173,13 @@
                         </td>
                         <td style="text-align: right; border-right: 1px dotted">
                             {% if user.doublesPartner is not null %}
-                                <a target="_blank" href="{{ path('user_edit', {fullName:user.doublesPartner.fullName}) }}"> {{ user.doublesPartner.lastName }}</a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a target="_blank"
+                                       href="{{ path('user_edit', {fullName:user.doublesPartner.fullName}) }}"> {{ user.doublesPartner.fullName }}</a>
+                                {% else %}
+                                    {{ user.doublesPartner.fullName }}
+                                {% endif %}
+
                                 {% if user.doublesPartner.playingDoubles == 1 %}
                                     <i style="color: green" class="fa fa-check"> </i>
                                 {% else %}
