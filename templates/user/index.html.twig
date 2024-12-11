@@ -13,6 +13,8 @@
             <th style="width: 95px">First Name</th>
             <th>Last Name</th>
             {% if is_granted('ROLE_ADMIN') %}
+                <th style="width: 350px; color: red">Full name</th>
+
                 <th style="width: 350px; color: red">Email</th>
                 <th style="width: 180px; color:red">Mobile</th>
                 <th style="border-right: 1px dotted">Roles</th>
@@ -92,6 +94,7 @@
                             {{ user.lastName }}
                         {% endif %}
                     </td>
+                    <td>{{ user.fullName }}</td>
 
                     {% if is_granted('ROLE_ADMIN') %}
                         <td>
