@@ -49,11 +49,6 @@ class UserController extends AbstractController
         ]);
     }
 
-
-
-
-
-
     /**
      * @Route("/new", name="user_new", methods={"GET", "POST"})
      */
@@ -115,15 +110,18 @@ class UserController extends AbstractController
             'lastName' => $last_name]);
         $form = $this->createForm(UserType::class, $user, ['user' => $user]);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $referer = $request->request->get('referer');
             if ($form->has('roles')) {
                 $roles = $form['roles']->getData();
                 $user->setRoles($roles);
             }
-            if(isset($request->request->password) && $request->request->password != null){
+//            if(isset($request->request->password) && $request->request->password != null){
+//        dd($form['password']->getData());
+//                dd($user->getPassword());
                 $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
-            }
+//            }
             $userRepository->add($user, true);
             return $this->redirect($referer);
         }

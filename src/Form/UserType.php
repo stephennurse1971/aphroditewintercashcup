@@ -33,6 +33,8 @@ class UserType extends AbstractType
             ->add('freeEntry')
             ->add('playingSingles')
             ->add('playingDoubles')
+            ->add('seedSingles')
+            ->add('seedDoubles')
             ->add('doublesPartner',EntityType::class,[
                 'class'=>User::class,
                 'required'=>false,

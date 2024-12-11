@@ -105,6 +105,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $subsidy;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $seedDoubles;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $seedSingles;
+
 
 
     public function getId(): ?int
@@ -352,6 +362,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSubsidy(?int $subsidy): self
     {
         $this->subsidy = $subsidy;
+
+        return $this;
+    }
+
+    public function getSeedDoubles(): ?int
+    {
+        return $this->seedDoubles;
+    }
+
+    public function setSeedDoubles(?int $seedDoubles): self
+    {
+        $this->seedDoubles = $seedDoubles;
+
+        return $this;
+    }
+
+    public function getSeedSingles(): ?int
+    {
+        return $this->seedSingles;
+    }
+
+    public function setSeedSingles(?int $seedSingles): self
+    {
+        $this->seedSingles = $seedSingles;
 
         return $this;
     }
