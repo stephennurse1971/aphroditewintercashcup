@@ -40,11 +40,11 @@
                 <th style="border-right: 1px dotted; width: 150px;color: red">Comments</th>
                 <th style="color: red">#</th>
                 <th style="color: red">#</th>
-                <th style="width: 250px; color: red">#</th>
-                <th style="width: 250px; color: red">#</th>
-                <th style="width: 250px; color: red">#</th>
-                <th style="width: 250px; color: red">#</th>
-                <th style="width: 100px; color: red">#</th>
+                <th style="color: red">#</th>
+                <th style="color: red">#</th>
+                <th style="color: red">#</th>
+                <th style="color: red">#</th>
+                <th style="color: red">#</th>
             {% endif %}
         </tr>
         {% set total_singles = 0 %}
@@ -105,7 +105,7 @@
                             {% else %}
                                 <a href="mailto:{{ user.email }}">
                                     <i title="{{ user.email }}" class="fas fa-envelope"> </i></a>
-{#                                {{ user.email }}#}
+                                {{ user.email }}
                             {% endif %}
                         </td>
                         <td>
