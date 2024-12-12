@@ -22,12 +22,16 @@
 
             {% if is_granted('ROLE_ADMIN') or title=='Singles' %}
                 <th>Playing<br>Singles</th>
-                <th>Seed<br>Singles</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <th>Seed<br>Singles</th>
+                {% endif %}
             {% endif %}
 
             {% if is_granted('ROLE_ADMIN') or title=='Doubles' %}
                 <th>Playing<br>Doubles</th>
-                <th>Seed<br>Doubles</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <th>Seed<br>Doubles</th>
+                {% endif %}
                 <th style="border-right: 1px dotted;width: 150px">Doubles<br>Partner</th>
             {% endif %}
 
@@ -95,9 +99,10 @@
                             {{ user.lastName }}
                         {% endif %}
                     </td>
-                    <td>{{ user.fullName }}</td>
+
 
                     {% if is_granted('ROLE_ADMIN') %}
+                        <td>{{ user.fullName }}</td>
                         <td>
                             {% if user.emailVerified == 1 %}
                                 <i style="color: green" class="fa fa-check"></i>
@@ -150,9 +155,11 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td style="text-align: center">
-                            {{ user.seedSingles }}
-                        </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <td style="text-align: center">
+                                {{ user.seedSingles }}
+                            </td>
+                        {% endif %}
                     {% endif %}
                     {% if is_granted('ROLE_ADMIN') or title=='Doubles' %}
                         <td style="text-align: center">
@@ -168,9 +175,11 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td style="text-align: center">
-                            {{ user.seedDoubles }}
-                        </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <td style="text-align: center">
+                                {{ user.seedDoubles }}
+                            </td>
+                        {% endif %}
                         <td style="text-align: right; border-right: 1px dotted">
                             {% if user.doublesPartner is not null %}
                                 {% if is_granted('ROLE_ADMIN') %}
