@@ -6,7 +6,7 @@
     <h1 style="color: red">{{ user.fullName }}</h1>
     <div class="row">
         <div class="col-6">
-            <button class="btn btn-outline-danger btn-sm password-reset float-right">Reset Password</button>
+{#            <button class="btn btn-outline-danger btn-sm password-reset float-right">Reset Password</button>#}
         </div>
     </div>
     {{ include('user/_form.html.twig', {'button_label': 'Update'}) }}
@@ -18,13 +18,13 @@
 
 {% block additionaljs %}
 <script>
-    $('.password').hide();
-    $('#user_password').val($('#user_password').val());
-
-    $('.password-reset').click(function () {
-        $('.password').toggle();
-    //     console.log($('#user_password').val());
-    });
+    // $('.password').hide();
+    // $('#user_password').val($('#user_password').val());
+    //
+    // $('.password-reset').click(function () {
+    //     $('.password').toggle();
+    // //     console.log($('#user_password').val());
+    // });
     let roles = [];
 
     {% for role in user.roles %}

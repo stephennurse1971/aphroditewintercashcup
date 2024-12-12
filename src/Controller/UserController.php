@@ -97,6 +97,7 @@ class UserController extends AbstractController
      */
     public function edit(Request $request, string $fullName, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, \Symfony\Component\Security\Core\Security $security): Response
     {
+        $referer = $request->request->get('referer');
         $user_name = explode(' ', $fullName);
         if (count($user_name) < 3) {
             $first_name = $user_name[0];
@@ -112,7 +113,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $referer = $request->request->get('referer');
+
             if ($form->has('roles')) {
                 $roles = $form['roles']->getData();
                 $user->setRoles($roles);
@@ -120,7 +121,7 @@ class UserController extends AbstractController
 //            if(isset($request->request->password) && $request->request->password != null){
 //        dd($form['password']->getData());
 //                dd($user->getPassword());
-                $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
+//                $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
 //            }
             $userRepository->add($user, true);
             return $this->redirect($referer);
@@ -180,7 +181,15 @@ class UserController extends AbstractController
             $data[] = [
                 $user->getFirstName(),
                 $user->getLastName(),
+                $user->getFullName(),
                 $user->getEmail(),
+                $user->getMobile(),
+                $user->getSeedSingles(),
+                $user->getSeedDoubles(),
+//                if($user->getDoublesPartner() is not null) {
+//                $user->getDoublesPartner()->getFullName()
+//            }
+
             ];
         }
         $spreadsheet = new Spreadsheet();
@@ -188,7 +197,11 @@ class UserController extends AbstractController
         $sheet->setTitle('Users');
         $sheet->getCell('A1')->setValue('First Name');
         $sheet->getCell('B1')->setValue('Last Name');
-        $sheet->getCell('C1')->setValue('Email');
+        $sheet->getCell('C1')->setValue('Full Name');
+        $sheet->getCell('D1')->setValue('Email');
+        $sheet->getCell('E1')->setValue('Mobile');
+        $sheet->getCell('F1')->setValue('Seed Singles');
+        $sheet->getCell('G1')->setValue('Seed Doubles');
 
         $sheet->fromArray($data, null, 'A2', true);
         $total_rows = $sheet->getHighestRow();
