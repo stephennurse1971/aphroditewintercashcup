@@ -1,47 +1,80 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Business Contacts Map {% endblock %}
+
 {% block body %}
-    <h3 style="color: red">Business Contacts
-    {% if subset !='All' %}
-    : {{ subset}}
-    {% endif %}
-    </h3>
-    <a class="btn btn-outline-info btn-sm" href="{{ path('business_contacts_map', {subset:'All'}) }}">
-        All
-    </a>
-    {% for business_type in business_types %}
-
-        {% if subset == business_type.businessType %}
-        <a class="btn btn-outline-success btn-sm" href="{{ path('business_contacts_map', {subset:business_type.businessType}) }}">
-            {{ business_type.businessType }}
-            <i style="color: {{ business_type.mapIconColour }}" class="{{ business_type.mapIcon }}"></i>
-        </a>
-        {% else %}
-            <a class="btn btn-outline-primary btn-sm" href="{{ path('business_contacts_map', {subset:business_type.businessType}) }}">
-                {{ business_type.businessType }}
-                <i style="color: {{ business_type.mapIconColour }}" class="{{ business_type.mapIcon }}"></i>
-            </a>
-        {% endif %}
-
-    {% endfor %}
-    <br>
-    {% for business_contact in business_contacts %}
-        <li>
-            {{ business_contact.company }} ({{ business_contact.businessType.businessType }})
-        </li>
-    {% endfor %}
     <div class="row">
-        <div class="col-12">
-
-
-            <br>
-            <iframe src="{{ CompanyDetailsService.getCompanyDetails.companyAddressMapLink }}"
-                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"></iframe>
-            <br>
-            <br>
-            <br>
-
+        <div class="col-10">
+            <h3 style="color: red">Business Contacts: {{ subset }}
+            </h3>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-outline-info btn-sm" href="{{ path('business_contacts_index') }}">Return to List</a>
         </div>
     </div>
+    {% include 'business_contacts/parts/map/subset_buttons.html.twig' %}
+    <br>
+    {% include 'business_contacts/parts/map/List_of_business_contacts.html.twig' %}
+    {% include 'business_contacts/parts/map/Max_Min_Average_Latitude_and_Longitude.html.twig' %}
+
+    <hr>
+    <div class="row">
+        <div class="col-12">
+            <div id="map" style="width: 100%; height: 850px;"
+                 data-locations='[
+                    {% for business_contact in business_contacts %}
+                    {% if subset =='All' %}
+                    {% set iconFileName = business_contact.businessType.mapIcon.iconFile %}
+                    {% else %}
+                    {% set iconFileName = 'map-marker.webp' %}
+                    {% endif %}
+          {
+            "lat": {{ business_contact.locationLatitude }},
+            "lng": {{ business_contact.locationLongitude }},
+            "name": "{{ business_contact.company | e('js') }}",
+            "icon": "{{ asset('administration/ATSSharedFiles/BusinessContactsMapIcons/'~iconFileName) | e('js') }}"
+          }
+          {% if not loop.last %}, {% endif %}
+        {% endfor %}
+     ]'>
+            </div>
+
+            <br><br><br>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get locations data from the map container
+            const mapElement = document.getElementById('map');
+            const locations = JSON.parse(mapElement.getAttribute('data-locations'));
+
+            // Initialize the map with average lat and long
+            const map = new google.maps.Map(mapElement, {
+                center: {lat: {{ latitude_average }}, lng: {{ longitude_average }} }, // Center the map on average lat/lng
+                zoom: 15,  // Adjust zoom level (range 10-14)
+            });
+
+            // Add markers to the map
+            locations.forEach(location => {
+                const marker = new google.maps.Marker({
+                    position: {lat: location.lat, lng: location.lng},
+                    map: map,
+                    title: location.name,
+                    icon: {
+                        url: location.icon,  // Use the icon URL
+                        scaledSize: new google.maps.Size(40, 40), // Customize marker size
+                    },
+                });
+
+                // Optional: Add an info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<h3>${location.name}</h3>`,
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+        });
+    </script>
 {% endblock %}

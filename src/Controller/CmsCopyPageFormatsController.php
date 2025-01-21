@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Entity\CmsCopyPageFormats;
 use App\Form\CmsCopyPageFormatsType;
 use App\Form\ImportType;
-use App\Repository\BusinessTypesRepository;
 use App\Repository\CmsCopyPageFormatsRepository;
-use App\Services\BusinessTypesImportService;
 use App\Services\CmsPageCopyPageFormatImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -20,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/cms/copy/page/formats')]
+#[Route('/cms_copy_page_formats')]
 class CmsCopyPageFormatsController extends AbstractController
 {
     #[Route('/index', name: 'cms_copy_page_formats_index', methods: ['GET'])]
@@ -44,9 +42,9 @@ class CmsCopyPageFormatsController extends AbstractController
             return $this->redirectToRoute('cms_copy_page_formats_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('cms_copy_page_formats/new.html.twig', [
+        return $this->render('cms_copy_page_formats/new.html.twig', [
             'cms_copy_page_format' => $cmsCopyPageFormat,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -70,9 +68,9 @@ class CmsCopyPageFormatsController extends AbstractController
             return $this->redirectToRoute('cms_copy_page_formats_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('cms_copy_page_formats/edit.html.twig', [
+        return $this->render('cms_copy_page_formats/edit.html.twig', [
             'cms_copy_page_format' => $cmsCopyPageFormat,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -103,16 +101,15 @@ class CmsCopyPageFormatsController extends AbstractController
 
 
     /**
-     * @Route ("/export/cms_copy_page_formats", name="cms_copy_page_formats_export" )
+     * @Route ("/export/CmsCopyPageFormats", name="cms_copy_page_formats_export" )
      */
     public
     function cmsCopypageFormatsExport(CmsCopyPageFormatsRepository $cmsCopyPageFormatsRepository)
     {
         $data = [];
         $exported_date = new \DateTime('now');
-        $exported_date_formatted = $exported_date->format('d-M-Y');
-        $exported_date_formatted_for_file = $exported_date->format('d-m-Y');
-        $fileName = 'cms_copy_page_formats_export_' . $exported_date_formatted_for_file . '.csv';
+        $exported_date_formatted = $exported_date->format('d-m-Y');
+        $fileName = 'cms_copy_page_formats_export_' . $exported_date_formatted . '.csv';
 
         $count = 0;
         $cms_copy_page_formats_list = $cmsCopyPageFormatsRepository->findAll();
@@ -153,10 +150,10 @@ class CmsCopyPageFormatsController extends AbstractController
     }
 
     /**
-     * @Route ("/import/cms_copy_page_formats", name="cms_copy_page_formats_import" )
+     * @Route ("/import/CmsCopyPageFormats", name="cms_copy_page_formats_import" )
      */
     public
-    function businessTypesImport(Request $request, SluggerInterface $slugger, CmsCopyPageFormatsRepository $cmsCopyPageFormatsRepository, CmsPageCopyPageFormatImportService $cmsPageCopyPageFormatImportService): Response
+    function cmsFormatsImport(Request $request, SluggerInterface $slugger, CmsCopyPageFormatsRepository $cmsCopyPageFormatsRepository, CmsPageCopyPageFormatImportService $cmsPageCopyPageFormatImportService): Response
     {
         $form = $this->createForm(ImportType::class);
         $form->handleRequest($request);

@@ -35,6 +35,16 @@
                 <ul>
                     <a target="_blank" href="{{ path('cms_copy_page_formats_index') }}">CMS Page Format</a>
                 </ul>
+                <ul>
+                    <a target="_blank" href="{{ path('map_icons_index') }}">Map Icons</a>
+                </ul>
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="border py-4">
+                <h3 style="color: red">Photos</h3>
+                <ul><a target="_blank" href="{{ path('photos_index') }}">Photos</a></ul>
+                <ul><a target="_blank" href="{{ path('photo_locations_index') }}">Photo Locations</a></ul>
             </div>
         </div>
 
@@ -60,6 +70,24 @@
                 </div>
             {% endif %}
         {% endif %}
+
+
+        {% if CompanyDetailsService.companyDetails is not null %}
+            {% if 1 ==1 %}
+                <div class="col-2">
+                    <div class="border py-4">
+                        <h2 style="color: red">Helpful Links/Files</h2>
+                        <ul>
+                            <a href="{{ path('useful_links_index', {'category':'All'}) }}">Helpful links</a>
+                        </ul>
+                        <ul>
+                            <a href="{{ path('file_attachments_index') }}">Helpful files</a>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
         <div class="col-12 col-md-2">
             <div class="border py-4">
                 <h2 style="color: red">Users</h2>
@@ -108,7 +136,7 @@
                         {% if app.request.getSchemeAndHttpHost() == CompanyDetailsService.companyDetails.companyWebsite %}
                             <ul>
                                 <a class="btn btn-outline-success btn-sm" target="_blank"
-                                   href="{{ path('export_live_database') }}">Export Live Data</a>
+                                   href="{{ path('export_database') }}">Export Live Data</a>
                             </ul>
                         {% endif %}
                     </div>

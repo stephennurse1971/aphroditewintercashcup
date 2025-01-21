@@ -5,14 +5,7 @@
 {% block body %}
     <h1 style="color: red">Languages</h1>
 
-    <div class="row">
-        <div class="col-2">
-            <a class="btn btn-success btn-sm" href="{{ path('languages_new') }}">New</a>
-        </div>
-        <div class="col-2">
-            <a class="btn btn-outline-primary btn-sm" href="{{ path('update_ranking') }}">Re-number</a>
-        </div>
-    </div>
+    {% include 'languages/parts/import_and_export.html.twig' %}
 
     <table class="table table-responsive">
         <thead>
@@ -25,6 +18,7 @@
             <th>Abbreviation</th>
             <th>LinkedIn Other</th>
             <th>Icon</th>
+            <th>Filename</th>
             <th>#</th>
             <th>#</th>
         </tr>
@@ -68,9 +62,12 @@
                 </td>
                 <td style="text-align: center">
                     {% if language.icon is not empty %}
-                        {% set icon = asset('administration/attachments/LanguageIcons/')~language.icon %}
+                        {% set icon = asset('administration/ATSSharedFiles/LanguageIcons/')~language.icon %}
                         <img height="50" width="50" src="{{ icon }}" class="rounded-circle test">
                     {% endif %}
+                </td>
+                <td>
+                    {{ language.icon }}
                 </td>
                 <td>
                     <a class="btn btn-outline-danger btn-sm" href="{{ path('languages_edit', {'id': language.id}) }}">Edit</a>

@@ -26,6 +26,7 @@ class   HomeController extends AbstractController
     {
         $companyDetails = $companyDetailsRepository->find('1');
         $homePagePhotosOnly = 0;
+        $qrcode=false;
         if ($companyDetails) {
             $homePagePhotosOnly = $companyDetails->isHomePagePhotosOnly();
             $qrcode = $companyDetails->isIncludeQRCodeHomePage();
@@ -39,16 +40,22 @@ class   HomeController extends AbstractController
             'staticPageName' => 'Home'
         ]);
 
+        $cms_photo = $cmsPhotoRepository->findBy(
+            ['staticPageName' => 'Home'],
+            ['ranking' => 'ASC']
+        );
 
-        $cms_photo = $cmsPhotoRepository->findBy([
-            'staticPageName' => 'Home'
-        ]);
 
         $cms_copy_ranking1 = $cmsCopyRepository->findOneBy([
             'staticPageName' => 'Home',
             'ranking' => '1',
         ]);
-        $page_layout=$cms_copy_ranking1->getPageLayout();
+
+        if ($cms_copy_ranking1) {
+            $page_layout = $cms_copy_ranking1->getPageLayout();
+        } else {
+            $page_layout = 'default';
+        }
 
         if ($cms_copy_ranking1) {
             if ($security->getUser()) {
@@ -74,7 +81,7 @@ class   HomeController extends AbstractController
                 'sub_pages' => $sub_pages,
                 'include_contact' => 'Yes',
                 'include_QR_code' => $qrcode,
-                'format'=>$page_layout
+                'format' => $page_layout
             ]);
         }
     }
@@ -129,7 +136,7 @@ class   HomeController extends AbstractController
      */
     public function advancedDashboard()
     {
-        return $this->render('template_parts_project_specific/advanced_dashboard_specific.html.twig', []);
+        return $this->render('template_parts_project_specific/dashboard_project_specific.html.twig', []);
     }
 
 
@@ -175,13 +182,17 @@ class   HomeController extends AbstractController
 
         if ($productEntity) {
             $cms_photo = $cmsPhotoRepository->findBy([
-                'product' => $productEntity
-            ]);
+                'product' => $productEntity,
+            ],
+                ['ranking' => 'ASC'])
+            ;
         } else {
             $cms_photo = $cmsPhotoRepository->findBy([
                 'staticPageName' => $product
-            ]);
+            ],
+                ['ranking' => 'ASC']);
         }
+
 
         $sub_pages = [];
         if ($cms_copy) {

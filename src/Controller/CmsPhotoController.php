@@ -22,10 +22,8 @@ class CmsPhotoController extends AbstractController
      */
     public function index(CmsPhotoRepository $cmsPhotoRepository): Response
     {
-        $site_pages = ['HomePage', 'AboutSN', 'Cyprus', 'Flying', 'Tennis', 'WebDesign', 'PrivateEquity', 'Risk & Capital Consulting'];
         return $this->render('cms_photo/index.html.twig', [
-            'cms_photos' => $cmsPhotoRepository->findAll(),
-            'site_pages' => $site_pages
+            'cms_photos' => $cmsPhotoRepository->findAll()
         ]);
     }
 
@@ -52,7 +50,7 @@ class CmsPhotoController extends AbstractController
                 $newFilename = $safeFilename . '.' . $photo->guessExtension();
                 try {
                     $photo->move(
-                        $this->getParameter('website_photos_directory'),
+                        $this->getParameter('cms_photos_directory'),
                         $newFilename
                     );
                     $cmsPhoto->setPhoto($newFilename);
@@ -96,12 +94,10 @@ class CmsPhotoController extends AbstractController
     {
         $form = $this->createForm(CmsPhotoType::class, $cmsPhoto);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $photo = $form->get('photo')->getData();
             if ($photo) {
                 $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
-
                 if ($cmsPhoto->getProduct()) {
                     $safeFilename = $cmsPhoto->getProduct()->getProduct() . uniqid();
                 }
@@ -111,7 +107,7 @@ class CmsPhotoController extends AbstractController
                 $newFilename = $safeFilename . '.' . $photo->guessExtension();
                 try {
                     $photo->move(
-                        $this->getParameter('website_photos_directory'),
+                        $this->getParameter('cms_photos_directory'),
                         $newFilename
                     );
                     $cmsPhoto->setPhoto($newFilename);
@@ -136,6 +132,29 @@ class CmsPhotoController extends AbstractController
     }
 
     /**
+     * @Route("/rotate_cms_photo/{id}", name="rotate_cms_photo")
+     */
+    public function rotatePhoto(Request $request, int $id, CmsPhotoRepository $cmsPhotoRepository, EntityManagerInterface $entityManager)
+    {
+        $referer = $request->server->get('HTTP_REFERER');
+        $cms_photo = $cmsPhotoRepository->find($id);
+
+        if ($cms_photo->getRotate() == null || $cms_photo->getRotate() == 0) {
+            $cms_photo->setRotate(90);
+        } elseif ($cms_photo->getRotate() == 90) {
+            $cms_photo->setRotate(180);
+        } elseif ($cms_photo->getRotate() == 180) {
+            $cms_photo->setRotate(270);
+        } elseif ($cms_photo->getRotate() == 270) {
+            $cms_photo->setRotate(0);
+        }
+        $entityManager->persist($cms_photo);
+        $entityManager->flush();
+        return $this->redirect($referer);
+    }
+
+
+    /**
      * @Route("/delete/{id}", name="cms_photo_delete", methods={"POST"})
      */
     public function delete(Request $request, CmsPhoto $cmsPhoto): Response
@@ -156,7 +175,7 @@ class CmsPhotoController extends AbstractController
         $referer = $request->headers->get('referer');
         $file_name = $cmsPhoto->getPhoto();
         if ($file_name) {
-            $file = $this->getParameter('website_photos_directory') . $file_name;
+            $file = $this->getParameter('cms_photos_directory') . $file_name;
             if (file_exists($file)) {
                 unlink($file);
             }
@@ -186,7 +205,7 @@ class CmsPhotoController extends AbstractController
         $referer = $request->server->get('HTTP_REFERER');
         $cms_photos = $cmsPhotoRepository->findAll();
 
-        $files = glob($this->getParameter('website_photos_directory') . "/*");
+        $files = glob($this->getParameter('cms_photos_directory') . "/*");
         foreach ($files as $file) {
             unlink($file);
         }

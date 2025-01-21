@@ -34,7 +34,7 @@ class UserController extends AbstractController
 {
     /**
      * @Route("/index", name="user_index", methods={"GET"})
-     * @Security("is_granted('ROLE_STAFF')")
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function index(UserRepository $userRepository, ProductRepository $servicesOfferedRepository): Response
     {
@@ -93,22 +93,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/edit/{fullName}", name="user_edit", methods={"GET", "POST"})
+     * @Route("/edit/{id}", name="user_edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, string $fullName, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, \Symfony\Component\Security\Core\Security $security): Response
+    public function edit(Request $request, int $id, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, \Symfony\Component\Security\Core\Security $security): Response
     {
         $referer = $request->request->get('referer');
-        $user_name = explode(' ', $fullName);
-        if (count($user_name) < 3) {
-            $first_name = $user_name[0];
-            $last_name = $user_name[1];
-        } else {
-            $first_name = $user_name[0];
-            $last_name = $user_name[1] . " " . $user_name[2];
-        }
-        $user = $userRepository->findOneBy([
-            'firstName' => $first_name,
-            'lastName' => $last_name]);
+
+        $user = $userRepository->findBy($id);
         $form = $this->createForm(UserType::class, $user, ['user' => $user]);
         $form->handleRequest($request);
 

@@ -2,15 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\BusinessTypes;
 use App\Entity\FacebookGroups;
 use App\Form\FacebookGroupsType;
 use App\Form\ImportType;
-use App\Repository\BusinessContactsRepository;
 use App\Repository\CompanyDetailsRepository;
 use App\Repository\FacebookGroupsRepository;
 use App\Repository\FacebookGroupsReviewsRepository;
-use App\Services\BusinessContactsImportService;
 use App\Services\FacebookGroupsImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -24,19 +21,26 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
- * @Route("/facebook/groups")
+ * @Route("/facebook_groups")
  */
 class FacebookGroupsController extends AbstractController
 {
     /**
      * @Route("/index", name="facebook_groups_index", methods={"GET"})
      */
-    public function index(FacebookGroupsRepository $facebookGroupsRepository, FacebookGroupsReviewsRepository $facebookGroupsReviewsRepository): Response
+    public function index(FacebookGroupsRepository $facebookGroupsRepository, FacebookGroupsReviewsRepository $facebookGroupsReviewsRepository, CompanyDetailsRepository $companyDetailsRepository): Response
     {
+        $company_details = $companyDetailsRepository->find('1');
+        $today = new \DateTime('now');
+        $history_months = $company_details->getFacebookReviewsHistoryShowMonths();
+        $cut_off_date = (clone $today)->modify("-{$history_months} months");
+
         return $this->render('facebook_groups/index.html.twig', [
             'facebook_groups' => $facebookGroupsRepository->findAll(),
             'facebook_group_reviews' => $facebookGroupsReviewsRepository->findByDateLatest(),
+            'cut_off_date' => $cut_off_date,
         ]);
+
     }
 
     /**
@@ -140,15 +144,14 @@ class FacebookGroupsController extends AbstractController
     }
 
     /**
-     * @Route ("/export/facebook_groups", name="facebook_groups_export" )
+     * @Route ("/export", name="facebook_groups_export" )
      */
     public function facebookGroupsExport(FacebookGroupsRepository $facebookGroupsRepository)
     {
         $data = [];
         $exported_date = new \DateTime('now');
         $exported_date_formatted = $exported_date->format('d-M-Y');
-        $exported_date_formatted_for_file = $exported_date->format('d-m-Y');
-        $fileName = 'facebook_groups_export_' . $exported_date_formatted_for_file . '.csv';
+        $fileName = 'facebook_groups_export_' . $exported_date_formatted . '.csv';
 
         $count = 0;
         $facebook_groups_list = $facebookGroupsRepository->findAll();
@@ -185,10 +188,8 @@ class FacebookGroupsController extends AbstractController
     }
 
 
-
-
     /**
-     * @Route ("/import/facebook_groups", name="facebook_groups_import" )
+     * @Route ("/import", name="facebook_groups_import" )
      */
     public function facebookGroupsImport(Request $request, SluggerInterface $slugger, FacebookGroupsRepository $facebookGroupsRepository, FacebookGroupsImportService $facebookGroupsImportService): Response
     {
@@ -217,8 +218,4 @@ class FacebookGroupsController extends AbstractController
             'heading' => 'Facebook Groups Import',
         ]);
     }
-
-
-
-
 }

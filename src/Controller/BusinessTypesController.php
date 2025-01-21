@@ -6,6 +6,7 @@ use App\Entity\BusinessTypes;
 use App\Form\BusinessTypesType;
 use App\Form\ImportType;
 use App\Repository\BusinessTypesRepository;
+use App\Repository\MapIconsRepository;
 use App\Services\BusinessTypesImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -26,10 +27,11 @@ class BusinessTypesController extends AbstractController
     /**
      * @Route("/index", name="business_types_index", methods={"GET"})
      */
-    public function index(BusinessTypesRepository $businessTypesRepository): Response
+    public function index(BusinessTypesRepository $businessTypesRepository, MapIconsRepository $mapIconsRepository): Response
     {
         return $this->render('business_types/index.html.twig', [
             'business_types' => $businessTypesRepository->findAll(),
+            'mapIcons' => $mapIconsRepository->findAll(),
         ]);
     }
 
@@ -44,7 +46,6 @@ class BusinessTypesController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $businessTypesRepository->add($businessType, true);
-
             return $this->redirectToRoute('business_types_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -67,10 +68,11 @@ class BusinessTypesController extends AbstractController
     /**
      * @Route("/edit/{id}", name="business_types_edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, BusinessTypes $businessType, BusinessTypesRepository $businessTypesRepository): Response
+    public function edit(Request $request, BusinessTypes $businessType, BusinessTypesRepository $businessTypesRepository, MapIconsRepository $mapIconsRepository): Response
     {
         $form = $this->createForm(BusinessTypesType::class, $businessType);
         $form->handleRequest($request);
+        $map_icons = $mapIconsRepository->findAll();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $businessTypesRepository->add($businessType, true);
@@ -81,6 +83,7 @@ class BusinessTypesController extends AbstractController
         return $this->renderForm('business_types/edit.html.twig', [
             'business_type' => $businessType,
             'form' => $form,
+            'map_icons' => $map_icons,
         ]);
     }
 
@@ -152,7 +155,7 @@ class BusinessTypesController extends AbstractController
     }
 
     /**
-     * @Route ("/export/business_types", name="business_types_export" )
+     * @Route ("/export/BusinessTypes", name="business_types_export" )
      */
     public
     function businessTypesExport(BusinessTypesRepository $businessTypesRepository)
@@ -170,9 +173,8 @@ class BusinessTypesController extends AbstractController
                 $business_type->getRanking(),
                 $business_type->getBusinessType(),
                 $business_type->getDescription(),
-                $business_type->getMapIcon(),
+                $business_type->getMapIcon()->getName(),
                 $business_type->getMapIconColour(),
-                $business_type->getMapDisplay(),
             ];
         }
         $spreadsheet = new Spreadsheet();
@@ -183,7 +185,6 @@ class BusinessTypesController extends AbstractController
         $sheet->getCell('C1')->setValue('Description');
         $sheet->getCell('D1')->setValue('Map Icon');
         $sheet->getCell('E1')->setValue('Map Icon Colour');
-        $sheet->getCell('F1')->setValue('Map Display');
 
         $sheet->fromArray($data, null, 'A2', true);
         $total_rows = $sheet->getHighestRow();
@@ -202,7 +203,7 @@ class BusinessTypesController extends AbstractController
     }
 
     /**
-     * @Route ("/import/business_types", name="business_types_import" )
+     * @Route ("/import/BusinessTypes", name="business_types_import" )
      */
     public
     function businessTypesImport(Request $request, SluggerInterface $slugger, BusinessTypesRepository $businessTypesRepository, BusinessTypesImportService $businessTypesImportService): Response

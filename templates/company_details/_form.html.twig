@@ -2,11 +2,14 @@
     .ck-content {
         height: 500px;
     }
-
+    #company_details_companyAddressInstructions {
+        height: 500px;
+    }
     #company_details_companyAddressMapLink {
         height: 300px;
     }
 </style>
+
 {{ form_start(form) }}
 <div class="row">
     <div class="col-2">
@@ -25,7 +28,7 @@
                         style="color: red" class="fa fa-trash"></i></a>
             <br>
             <img height="50" width="50"
-                 src="{{ asset('administration/attachments/Favicons/'~ company_details.faviconLive) }}"
+                 src="{{ asset('administration/Attachments/FaviconsAndQR/'~ company_details.faviconLive) }}"
                  class="rounded-circle test">
         {% endif %}
         <div class="favicon-upload-live-container">
@@ -40,7 +43,7 @@
                         style="color: red" class="fa fa-trash"></i></a>
             <br>
             <img height="50" width="50"
-                 src="{{ asset('administration/attachments/Favicons/'~ company_details.faviconDev) }}"
+                 src="{{ asset('administration/Attachments/FaviconsAndQR/' ~ company_details.faviconDev) }}"
                  class="rounded-circle test">
             <br>
         {% endif %}
@@ -58,7 +61,8 @@
         <h4>SQL Export</h4>
         {{ form_row(form.sqlDatabase) }}
         {{ form_row(form.databasePassword) }}
-        <a class="btn btn-outline-danger" href="{{ path('export_live_database') }}">Export database</a>
+        <a class="btn btn-outline-danger" href="{{ path('export_database') }}">Export database</a>
+
 
     </div>
 
@@ -68,24 +72,27 @@
         {{ form_row(form.companyAddressCity) }}
         {{ form_row(form.companyAddressPostalCode) }}
         {{ form_row(form.companyAddressCountry) }}
-        <a target="_blank" href="{{ path('office_address') }}">
-            <i style="color: red" class="fa fa-map-marker mr-3"></i></a>
+
         <hr>
-        <i title="Please note, weather scrape is controlled by Company longitude & latitude" class="fa fa-info-circle"></i>
+        <a target="_blank" href="{{ path('weather_index') }}">
+            <i title="Please note, weather scrape is controlled by Company longitude & latitude"
+               class="fa fa-info-circle"></i></a>
         {{ form_row(form.weatherLocation) }}
         {{ form_row(form.companyTimeZone) }}
         {{ form_row(form.currency) }}
     </div>
-
     <div class="col-2">
-        <a class="btn btn-outline-danger btn-sm" href="{{ path('office_address') }}">
-            Get GPS</a>
-        <i title="Button will add current GPS co-ordinates to the record" class="fa fa-info-circle"></i>
-        <hr>
-        <button class="btn btn-primary " onclick="getLocation()">Get Coordinates</button>
+        <button id="getLocationButton" title="Button will add current GPS co-ordinates to the record"
+                class="btn btn-primary btn-sm"
+                onclick="getLocation('{{ company_details.id }}')">Get Longitude + Latitude
+        </button>
         <hr>
         {{ form_row(form.companyAddressLatitude) }}
         {{ form_row(form.companyAddressLongitude) }}
+        <a target="_blank" href="{{ path('office_address') }}">
+            <i style="color: red" class="fa fa-map-marker mr-3"></i></a>
+        <i style="color: blue" title="Start with 'https://https://www.google.com/maps/' and end with '2s'"
+           class="fa fa-info-circle"></i>
         {{ form_row(form.companyAddressMapLink) }}
     </div>
 
@@ -103,14 +110,18 @@
         {{ form_row(form.twitter) }}
 
         {% if company_details.companyQrCode is not null %}
-            <b>QR Code:</b><br>
+            <b>QR Code:</b>
+            <br>
+            <a class="btn btn-warning btn-sm" title="QR Monkey" target="_blank" href="https://www.qrcode-monkey.com/">QR
+                Monkey</a>
+            <br>
             {{ company_details.companyQrCode }}
             <a class="btn btn-outline-danger btn-sm"
                href="{{ path('company_details_delete_qr_code', {'id': '1'}) }}"> <i
                         style="color: red" class="fa fa-trash"></i></a>
             <br>
             <img height="50" width="50"
-                 src="{{ asset('administration/attachments/Favicons/'~ company_details.companyQrCode) }}"
+                 src="{{ asset('administration/Attachments/FaviconsAndQR/' ~ company_details.companyQrCode) }}"
                  class="rounded-circle test">
             <br>
         {% endif %}
@@ -136,6 +147,7 @@
         {{ form_row(form.headerDisplayContactDetails) }}
         {{ form_row(form.headerDisplayProducts) }}
         {{ form_row(form.headerDisplaySubProducts) }}
+        {{ form_row(form.headerDisplayPhotos) }}
         {{ form_row(form.headerDisplayTandCs) }}
         {{ form_row(form.headerDisplayPricing) }}
         <h4>Dashboard: Display...</h4>
@@ -155,15 +167,45 @@
         {{ form_row(form.footerDisplayAddress) }}
         {{ form_row(form.footerDisplayTelNumbers) }}
     </div>
-
     <div class="col-3">
         <h4>Registration:</h4>
         {{ form_row(form.multiLingual) }}
         {{ form_row(form.enableUserRegistration) }}
-        {{ form_row(form.registrationEmail) }}
     </div>
-
 </div>
-
+<hr>
 <button class="btn btn-success btn-sm">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
+
+
+<script>
+
+    var companyDetailId = '';
+
+    function getLocation(id) {
+        //alert(getLocation(id));
+        companyDetailId = id;//alert(companyDetailId);
+        if (navigator.geolocation) {
+            // alert("a");
+            navigator.geolocation.getCurrentPosition(showLocation);
+        } else {
+            $('#location').html('Geolocation is not supported by this browser.');
+        }
+    }
+
+    function showLocation(position) {
+        var company_details_companyAddressLatitude = position.coords.latitude;
+        var company_details_companyAddressLongitude = position.coords.longitude;
+        $('#company_details_companyAddressLatitude').val(company_details_companyAddressLatitude);
+        $('#company_details_companyAddressLongitude').val(company_details_companyAddressLongitude);
+        var pin = company_details_companyAddressLatitude + "," + company_details_companyAddressLongitude;
+        $.ajax({
+            type: 'POST',
+            url: 'update/location',
+            data: 'latitude=' + company_details_companyAddressLatitude + '&longitude=' + company_details_companyAddressLongitude + '&id=' + companyDetailId,
+            success: function (msg) {
+                //   location.reload();
+            }
+        });
+    }
+</script>
