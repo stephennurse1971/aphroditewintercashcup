@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/photolocations")
- * @IsGranted("ROLE_ADMIN")
+ * @IsGranted("ROLE_USER")
  */
 class PhotoLocationsController extends AbstractController
 {
@@ -129,5 +129,4 @@ class PhotoLocationsController extends AbstractController
         $referer = $request->server->get('HTTP_REFERER');
         return $this->redirect($referer);
     }
-
 }
