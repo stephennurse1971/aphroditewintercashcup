@@ -18,12 +18,10 @@
                 {% endif %}
             {% endif %}
         </div>
-
         <div class="col-2">
             <b>Location: </b> {{ CompanyDetailsService.getCompanyDetails.weatherLocation }}
             <a href="{{ path('office_address') }}"><i style="color: red" class="fa fa-map-marker"></i></a>
         </div>
-
         <div class="col-3">
             {% if is_granted('ROLE_ADMIN') %}
                 <a class="btn btn-outline-danger btn-sm" href="{{ path('weather_delete_all') }}">Delete All</a>
