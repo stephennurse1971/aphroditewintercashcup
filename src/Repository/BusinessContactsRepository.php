@@ -51,10 +51,21 @@ class BusinessContactsRepository extends ServiceEntityRepository
 
     public function countByBusinessTypeAndStatus($businessType, $status = 'Approved')
     {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.businessType = :businessType')
+            ->setParameter('businessType', $businessType)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countByBusinessTypeAndStatusAndMapLocation($businessType, $status = 'Approved')
+    {
         $qb = $this->createQueryBuilder('bc');
         $qb->select('COUNT(bc.id)')
             ->where('bc.businessType = :businessType')
             ->andWhere('bc.status = :status')
+            ->andWhere('bc.locationLatitude != 0')
             ->setParameter('businessType', $businessType)
             ->setParameter('status', $status);
 

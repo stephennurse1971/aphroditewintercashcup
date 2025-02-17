@@ -9,6 +9,10 @@
                         <a target="_blank" href="{{ path('company_details_edit', {'id': '1'}) }}">
                             <i style="color: red" class="fa fa-pen"></i>
                         </a>
+                        <a target="_blank" href="{{ path('company_details_show', {'id': '1'}) }}">
+                            <i style="color: red" class="fa fa-eye"></i>
+                        </a>
+
                     {% else %}
                         <a target="_blank" href="{{ path('company_details_new') }}">
                             <i style="color: blue" class="fa fa-pen"></i>
@@ -43,7 +47,7 @@
                     {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
                             <a class="nav-link" target="_blank" href="{{ path('dashboard') }}"><i
-                                        class="fa fa-chalkboard"></i></a>
+                                        class="fa fa-tachometer-alt"></i></a>
                         </li>
 
                         {% if CountPendingWebsiteInquiriesService.countContacts >0 %}
@@ -59,36 +63,38 @@
                     {% endif %}
 
                     <!-- Nav Item #3 - Products -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% if CompanyDetailsService.companyDetails is not null %}
-                                {{ CompanyDetailsService.companyDetails.titleProducts }}
-                            {% else %}
-                                Products
-                            {% endif %}
-                        </a>
-
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% set products = ProductService.getProductMainAll %}
-
-                            {% for product in products %}
-
-                                {% if product.isActive==1 %}
-                                    <a class="dropdown-item"
-                                       href="{{ path('product_display', { product: product.product}) }}">{{ product.product }}
-                                    </a>
-                                {% else %}
-                                    {% if is_granted('ROLE_ADMIN') and product.isActive ==0 %}
-                                        <a class="dropdown-item"
-                                           href="{{ path('product_display', { product: product.product}) }}">
-                                            <span style="color: red">{{ product.product }}*</span>
-                                        </a>
+                    {% if CompanyDetailsService.companyDetails is not null %}
+                        {% if CompanyDetailsService.companyDetails.headerDisplayProducts ==1 %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if CompanyDetailsService.companyDetails.titleProducts is not null %}
+                                        {{ CompanyDetailsService.companyDetails.titleProducts }}
+                                    {% else %}
+                                        Products
                                     {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </li>
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    {% set products = ProductService.getProductMainAll %}
+                                    {% for product in products %}
+                                        {% if product.isActive==1 %}
+                                            <a class="dropdown-item" title="{{ product.notes|striptags }}"
+                                               href="{{ path('product_display', { product: product.product}) }}">{{ product.product }}
+                                            </a>
+                                        {% else %}
+                                            {% if is_granted('ROLE_ADMIN') and product.isActive ==0 %}
+                                                <a class="dropdown-item" title="{{ product.notes|striptags }}"
+                                                   href="{{ path('product_display', { product: product.product}) }}">
+                                                    <span style="color: red">{{ product.product }}*</span>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endif %}
 
 
                     <!-- Nav Item #4 - SubProducts -->
@@ -108,12 +114,12 @@
                                         {% set products = ProductService.getProductSubAll %}
                                         {% for product in products %}
                                             {% if product.isActive==1 %}
-                                                <a class="dropdown-item"
+                                                <a class="dropdown-item" title="{{ product.notes|striptags }}"
                                                    href="{{ path('product_display', { product: product.product}) }}">{{ product.product }}
                                                 </a>
                                             {% else %}
                                                 {% if is_granted('ROLE_ADMIN') and product.isActive ==0 %}
-                                                    <a class="dropdown-item"
+                                                    <a class="dropdown-item" title="{{ product.notes|striptags }}"
                                                        href="{{ path('product_display', { product: product.product}) }}">
                                                         <span style="color: red">{{ product.product }}*</span>
                                                     </a>
@@ -142,16 +148,16 @@
                         {% if CompanyDetailsService.companyDetails.headerDisplayPhotos ==1 and CountPhotoLocationsService.count() >0 %}
                             <li class="nav-item">
                                 {% if CountPhotoLocationsService.count() >1 %}
-                                    <a class="nav-link" href="{{ path('photos_index' ) }}">Photos - Multiple locations</a>
+                                    <a class="nav-link" href="{{ path('photos_index' ) }}">Photos</a>
                                 {% endif %}
                                 {% if CountPhotoLocationsService.count() ==1 %}
-                                    <a class="nav-link" href="{{ path('show_photos_by_location', { id: CountPhotoLocationsService.maxId(), author: 'All', format: 'Full' }) }}">Gallery</a>
+                                    <a class="nav-link"
+                                       href="{{ path('show_photos_by_location', { id: CountPhotoLocationsService.maxId(), author: 'All', format: 'Full' }) }}">Gallery</a>
                                 {% endif %}
                             </li>
                         {% endif %}
                     {% endif %}
 
-                    {% include 'template_parts_project_specific/header_project_specific1.html.twig' %}
 
                     <!-- Nav Item #6 - Useful Contacts/ Weather -->
                     {% if CompanyDetailsService.companyDetails is not null %}
@@ -167,25 +173,32 @@
                                     {% endif %}
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a style="color: red" class="dropdown-item"
+                                           href="{{ path('useful_links_index', {'category':'All'}) }}">Links
+                                        </a>
+
+                                        <a style="color: red" class="dropdown-item" href="{{ path('file_attachments_index') }}">Files
+                                        </a>
+                                        <hr>
+                                    {% endif %}
+
+
+                                    {% include 'template_parts_project_specific/header_project_specific1.html.twig' %}
+
                                     {% if CompanyDetailsService.companyDetails.headerDisplayBusinessContacts ==1 %}
-                                        <a class="dropdown-item" href="{{ path('business_contacts_index') }}">Useful
+                                        <a style="color: black" class="dropdown-item"
+                                           href="{{ path('business_contacts_index') }}">Useful
                                             contacts
                                         </a>
                                     {% endif %}
 
                                     {% if  CompanyDetailsService.companyDetails.headerDisplayWeather ==1 %}
-                                        <a class="dropdown-item" href="{{ path('weather_index') }}">Weather
+                                        <a style="color: black" class="dropdown-item"
+                                           href="{{ path('weather_index') }}">Weather
                                         </a>
                                     {% endif %}
-
-                                    {% if is_granted('ROLE_ADMIN') %}
-                                        <hr>
-                                        <a style="color: red" class="dropdown-item"
-                                           href="{{ path('useful_links_index', {'category':'All'}) }}">Helpful links</a>
-                                        <a style="color: red" class="dropdown-item"
-                                           href="{{ path('file_attachments_index') }}">Useful files</a>
-                                    {% endif %}
-
                                 </div>
                             </li>
                         {% endif %}

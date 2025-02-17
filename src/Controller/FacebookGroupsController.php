@@ -8,7 +8,7 @@ use App\Form\ImportType;
 use App\Repository\CompanyDetailsRepository;
 use App\Repository\FacebookGroupsRepository;
 use App\Repository\FacebookGroupsReviewsRepository;
-use App\Services\FacebookGroupsImportService;
+use App\Services\ImportFacebookGroupsService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -32,7 +32,7 @@ class FacebookGroupsController extends AbstractController
     {
         $company_details = $companyDetailsRepository->find('1');
         $today = new \DateTime('now');
-        $history_months = $company_details->getFacebookReviewsHistoryShowMonths();
+        $history_months = max(1,$company_details->getFacebookReviewsHistoryShowMonths());
         $cut_off_date = (clone $today)->modify("-{$history_months} months");
 
         return $this->render('facebook_groups/index.html.twig', [
@@ -40,7 +40,6 @@ class FacebookGroupsController extends AbstractController
             'facebook_group_reviews' => $facebookGroupsReviewsRepository->findByDateLatest(),
             'cut_off_date' => $cut_off_date,
         ]);
-
     }
 
     /**
@@ -158,6 +157,7 @@ class FacebookGroupsController extends AbstractController
         $concatenatedNotes = "Exported on: " . $exported_date_formatted;
         foreach ($facebook_groups_list as $facebook_groups) {
             $data[] = [
+                "FacebookGroups",
                 $facebook_groups->getName(),
                 $facebook_groups->getLink(),
                 $facebook_groups->getComments(),
@@ -166,10 +166,11 @@ class FacebookGroupsController extends AbstractController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Facebook Groups');
-        $sheet->getCell('A1')->setValue('Name');
-        $sheet->getCell('B1')->setValue('Link');
-        $sheet->getCell('C1')->setValue('Comments');
-        $sheet->getCell('D1')->setValue($concatenatedNotes);
+        $sheet->getCell('A1')->setValue('Entity');
+        $sheet->getCell('B1')->setValue('Name');
+        $sheet->getCell('C1')->setValue('Link');
+        $sheet->getCell('D1')->setValue('Comments');
+        $sheet->getCell('E1')->setValue($concatenatedNotes);
 
         $sheet->fromArray($data, null, 'A2', true);
         $total_rows = $sheet->getHighestRow();
@@ -191,7 +192,7 @@ class FacebookGroupsController extends AbstractController
     /**
      * @Route ("/import", name="facebook_groups_import" )
      */
-    public function facebookGroupsImport(Request $request, SluggerInterface $slugger, FacebookGroupsRepository $facebookGroupsRepository, FacebookGroupsImportService $facebookGroupsImportService): Response
+    public function facebookGroupsImport(Request $request, SluggerInterface $slugger, ImportFacebookGroupsService $importFacebookGroupsService): Response
     {
         $form = $this->createForm(ImportType::class);
         $form->handleRequest($request);
@@ -209,7 +210,7 @@ class FacebookGroupsController extends AbstractController
                 } catch (FileException $e) {
                     die('Import failed');
                 }
-                $facebookGroupsImportService->importFaceBookGroups($newFilename);
+                $importFacebookGroupsService->importFaceBookGroups($newFilename);
                 return $this->redirectToRoute('facebook_groups_index');
             }
         }

@@ -37,10 +37,28 @@ class ProductService
             ['ranking' => 'ASC']);
     }
 
-    public function getProductFooter()
+    public function getProductMainFooter()
     {
         return $this->productRepository->findBy([
-            'includeInFooter' => '1'
+            'includeInFooter' => '1',
+            'category' => 'Main'
+        ],
+            ['ranking' => 'ASC']);
+    }
+
+    public function getProductSubFooter()
+    {
+        return $this->productRepository->findBy([
+            'includeInFooter' => '1',
+            'category' => 'Sub'
+        ],
+            ['ranking' => 'ASC']);
+    }
+
+    public function getProductContactForm()
+    {
+        return $this->productRepository->findBy([
+            'includeInContactForm' => '1'
         ],
             ['ranking' => 'ASC']);
     }

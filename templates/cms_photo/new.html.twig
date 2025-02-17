@@ -32,5 +32,11 @@
                 $(".product-container").show();
             }
         })
+
+
+        $("[id^='cms_photo_photoOrVideo_']").click(function () {
+            $(".rotate-input-field").toggle($(this).val() !== 'Video');
+        });
+
     </script>
 {% endblock %}

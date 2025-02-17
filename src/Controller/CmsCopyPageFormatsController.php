@@ -6,10 +6,11 @@ use App\Entity\CmsCopyPageFormats;
 use App\Form\CmsCopyPageFormatsType;
 use App\Form\ImportType;
 use App\Repository\CmsCopyPageFormatsRepository;
-use App\Services\CmsPageCopyPageFormatImportService;
+use App\Services\ImportCmsPageCopyPageFormatService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/cms_copy_page_formats')]
+
+/**
+ * @Route("/cms_copy_page_formats")
+ * @Security("is_granted('ROLE_ADMIN')")
+ */
+
+
+
 class CmsCopyPageFormatsController extends AbstractController
 {
     #[Route('/index', name: 'cms_copy_page_formats_index', methods: ['GET'])]
@@ -115,6 +123,7 @@ class CmsCopyPageFormatsController extends AbstractController
         $cms_copy_page_formats_list = $cmsCopyPageFormatsRepository->findAll();
         foreach ($cms_copy_page_formats_list as $cms_copy_page_format) {
             $data[] = [
+                'CMSCopyPageFormats',
                 $cms_copy_page_format->getName(),
                 $cms_copy_page_format->getDescription(),
                 $cms_copy_page_format->getUses(),
@@ -126,12 +135,13 @@ class CmsCopyPageFormatsController extends AbstractController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('CMS Copy Page Formats');
-        $sheet->getCell('A1')->setValue('Name');
-        $sheet->getCell('B1')->setValue('Description');
-        $sheet->getCell('C1')->setValue('Uses');
-        $sheet->getCell('D1')->setValue('Pros');
-        $sheet->getCell('E1')->setValue('Cons');
-        $sheet->getCell('F1')->setValue('Code');
+        $sheet->getCell('A1')->setValue('Entity');
+        $sheet->getCell('B1')->setValue('Name');
+        $sheet->getCell('C1')->setValue('Description');
+        $sheet->getCell('D1')->setValue('Uses');
+        $sheet->getCell('E1')->setValue('Pros');
+        $sheet->getCell('F1')->setValue('Cons');
+        $sheet->getCell('G1')->setValue('Code');
 
         $sheet->fromArray($data, null, 'A2', true);
         $total_rows = $sheet->getHighestRow();
@@ -153,7 +163,7 @@ class CmsCopyPageFormatsController extends AbstractController
      * @Route ("/import/CmsCopyPageFormats", name="cms_copy_page_formats_import" )
      */
     public
-    function cmsFormatsImport(Request $request, SluggerInterface $slugger, CmsCopyPageFormatsRepository $cmsCopyPageFormatsRepository, CmsPageCopyPageFormatImportService $cmsPageCopyPageFormatImportService): Response
+    function cmsFormatsImport(Request $request, SluggerInterface $slugger, CmsCopyPageFormatsRepository $cmsCopyPageFormatsRepository, ImportCmsPageCopyPageFormatService $cmsPageCopyPageFormatImportService): Response
     {
         $form = $this->createForm(ImportType::class);
         $form->handleRequest($request);

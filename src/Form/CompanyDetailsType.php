@@ -23,26 +23,36 @@ class CompanyDetailsType extends AbstractType
             ->add('companyName', TextType::class, [
                 'label' => $this->translationsWorker->getTranslations('Company Name'),
             ])
-            ->add('contactFirstName', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Contact First Name'),
-                'required' => false,
-            ])
-            ->add('contactLastName', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Contact Last Name'),
-                'required' => false,
-            ])
+
             ->add('companyWebsite', TextType::class, [
                 'label' => $this->translationsWorker->getTranslations('Company Website'),
                 'required' => false,
             ])
-            ->add('sqlDatabase', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('SQL Database'),
+
+            ->add('contactFirstName', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Contact First Name'),
                 'required' => false,
             ])
-            ->add('databasePassword', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Database Password'),
+
+            ->add('contactLastName', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Contact Last Name'),
                 'required' => false,
             ])
+
+
+            ->add('companyTel', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Telephone'),
+                'required' => false,
+            ])
+            ->add('companyMobile', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Mobile'),
+                'required' => false,
+            ])
+            ->add('companySkype', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Skype'),
+                'required' => false,
+            ])
+
             ->add('faviconLive', FileType::class, [
                 'label' => $this->translationsWorker->getTranslations('Favicon Live'),
                 'mapped' => false,
@@ -53,61 +63,88 @@ class CompanyDetailsType extends AbstractType
                 'mapped' => false,
                 'required' => false
             ])
-            ->add('companyEmail', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Email'),
-                'required' => false,
-            ])
-            ->add('companyEmailPassword', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Email Password'),
-                'required' => false,
-            ])
-            ->add('companyEmailImportDirectory', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Email Import Directory'),
-                'required' => false,
-            ])
-            ->add('companyEmailImportProcessedDirectory', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Email Import Processed Directory'),
-                'required' => false,
-            ])
-            ->add('companyTel', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Telephone'),
-                'required' => false,
-            ])
-            ->add('companyMobile', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Mobile'),
-                'required' => false,
-            ])
-            ->add('companySkype', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Skype'),
-                'required' => false,
-            ])
+
             ->add('companyQrCode', FileType::class, [
                 'label' => $this->translationsWorker->getTranslations('QR Code'),
                 'mapped' => false,
                 'required' => false
             ])
+
+            ->add('companyEmail', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Email'),
+                'required' => false,
+            ])
+            ->add('companyEmailPassword', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Password'),
+                'required' => false,
+            ])
+            ->add('companyEmailImportDirectory', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Import Directory'),
+                'required' => false,
+            ])
+            ->add('companyEmailImportProcessedDirectory', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Import Processed Directory'),
+                'required' => false,
+            ])
+
+            ->add('sqlDatabase', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Database'),
+                'required' => false,
+            ])
+            ->add('databasePassword', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Password'),
+                'required' => false,
+            ])
+
+
+
+
+
             ->add('companyAddressStreet', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Street'),
+                'label' => $this->translationsWorker->getTranslations('Street'),
                 'required' => false,
             ])
             ->add('companyAddressTown', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Town'),
+                'label' => $this->translationsWorker->getTranslations('Town'),
                 'required' => false,
             ])
             ->add('companyAddressCity', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address City'),
+                'label' => $this->translationsWorker->getTranslations('City'),
                 'required' => false,
             ])
             ->add('companyAddressPostalCode', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Postal Code'),
+                'label' => $this->translationsWorker->getTranslations('Post Code'),
                 'required' => false,
             ])
             ->add('companyAddressCountry', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Country'),
+                'label' => $this->translationsWorker->getTranslations('Country'),
                 'required' => false,
             ])
+            ->add('companyAddressMapLink', TextareaType::class, [
+                'label' => $this->translationsWorker->getTranslations('Map Link'),
+                'required' => false,
+            ])
+            ->add('companyAddressLongitude', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Longitude'),
+                'required' => false,
+            ])
+            ->add('companyAddressLatitude', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Latitude'),
+                'required' => false,
+            ])
+            ->add('companyAddressInstructions', TextareaType::class, [
+                'label' => $this->translationsWorker->getTranslations('Instructions'),
+                'required' => false,
+            ])
+
+            ->add('weatherLocation', TextType::class, [
+                'label' => $this->translationsWorker->getTranslations('Weather Location'),
+                'required' => false,
+            ])
+
+
             ->add('companyTimeZone', ChoiceType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Time Zone'),
+                'label' => $this->translationsWorker->getTranslations('Time Zone'),
                 'multiple' => false,
                 'expanded' => FALSE,
                 'required' => false,
@@ -145,30 +182,13 @@ class CompanyDetailsType extends AbstractType
                     'NZST' => 'NZST'
                 ],
             ])
+
             ->add('currency', TextType::class, [
                 'label' => $this->translationsWorker->getTranslations('Currency'),
                 'required' => false,
             ])
-            ->add('weatherLocation', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Weather Location'),
-                'required' => false,
-            ])
-            ->add('companyAddressMapLink', TextareaType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Map Link'),
-                'required' => false,
-            ])
-            ->add('companyAddressLongitude', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Longitude'),
-                'required' => false,
-            ])
-            ->add('companyAddressLatitude', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Latitude'),
-                'required' => false,
-            ])
-            ->add('companyAddressInstructions', TextareaType::class, [
-                'label' => $this->translationsWorker->getTranslations('Company Address Instructions'),
-                'required' => false,
-            ])
+
+
             ->add('facebook', TextType::class, [
                 'label' => $this->translationsWorker->getTranslations('Facebook'),
                 'required' => false,
@@ -185,6 +205,29 @@ class CompanyDetailsType extends AbstractType
                 'label' => $this->translationsWorker->getTranslations('LinkedIn'),
                 'required' => false,
             ])
+
+
+
+            ->add('registrationEmail', TextareaType::class, [
+                'label' => $this->translationsWorker->getTranslations('Registration Email'),
+                'required' => false,
+            ])
+
+            ->add('websiteContactsEmailAlert', CheckboxType::class, [
+                'label' => $this->translationsWorker->getTranslations('Email alert'),
+                'required' => false])
+            ->add('websiteContactsAutoReply', ChoiceType::class, [
+                'label' => $this->translationsWorker->getTranslations('Automatic replies'),
+                'multiple' => false,
+                'expanded' => false,
+                'required' => false,
+                'choices' => [
+                    'Auto' => 'Auto',
+                    'Semi-auto' => 'Semi-auto',
+                    'Manual' => 'Manual',
+                ],
+            ])
+
             ->add('headerDisplayProducts', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Products'),
                 'required' => false])
@@ -212,19 +255,29 @@ class CompanyDetailsType extends AbstractType
             ->add('headerDisplayBusinessContacts', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Business Contacts'),
                 'required' => false])
+
             ->add('headerDisplayFacebookPages', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Facebook Pages'),
                 'required' => false])
             ->add('facebookReviewsHistoryShowMonths', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Facebook Reviews History (months)'),
+                'label' => $this->translationsWorker->getTranslations('History (months)'),
                 'required' => false,
             ])
             ->add('headerDisplayCompetitors', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Competitors'),
                 'required' => false])
+
+
+
+
             ->add('headerDisplayWeather', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Weather'),
                 'required' => false])
+
+
+
+
+
             ->add('footerDisplayContactDetails', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Contact Details'),
                 'required' => false])
@@ -256,21 +309,37 @@ class CompanyDetailsType extends AbstractType
                 'label' => $this->translationsWorker->getTranslations('Multi-lingual site'),
                 'required' => false])
             ->add('titleProducts', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Title Products'),
+                'label' => $this->translationsWorker->getTranslations('Products'),
                 'required'=>false
             ])
             ->add('titleSubProducts', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Title Sub-Products'),
+                'label' => $this->translationsWorker->getTranslations('Sub-Products'),
                 'required'=>false
             ])
             ->add('titleUsefulLinks', TextType::class, [
-                'label' => $this->translationsWorker->getTranslations('Title Useful Links'),
+                'label' => $this->translationsWorker->getTranslations('Useful Links'),
                 'required'=>false
             ])
             ->add('enableUserRegistration', CheckboxType::class, [
                 'label' => $this->translationsWorker->getTranslations('Enable Registration'),
-                'required' => false]);
+                'required' => false])
 
+            ->add('userIncludeHomeAddress', CheckboxType::class, [
+                'label' => $this->translationsWorker->getTranslations('Home Address'),
+                'required' => false])
+
+            ->add('userIncludeBusinessAddress', CheckboxType::class, [
+                'label' => $this->translationsWorker->getTranslations('Business Address'),
+                'required' => false])
+
+            ->add('userIncludePersonalDetails', CheckboxType::class, [
+                'label' => $this->translationsWorker->getTranslations('Personal Details'),
+                'required' => false])
+
+            ->add('userIncludeJobDetails', CheckboxType::class, [
+                'label' => $this->translationsWorker->getTranslations('Job Details'),
+                'required' => false])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

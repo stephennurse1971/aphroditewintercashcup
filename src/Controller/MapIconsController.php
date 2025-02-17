@@ -6,10 +6,11 @@ use App\Entity\MapIcons;
 use App\Form\ImportType;
 use App\Form\MapIconsType;
 use App\Repository\MapIconsRepository;
-use App\Services\MapIconsImportService;
+use App\Services\ImportMapIconsService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/map/icons')]
+/**
+ * @Route("/map_icons")
+ * @Security("is_granted('ROLE_ADMIN')")
+ */
 class MapIconsController extends AbstractController
 {
     #[Route('/index', name: 'map_icons_index', methods: ['GET'])]
@@ -133,7 +137,7 @@ class MapIconsController extends AbstractController
         $fileName = $mapIcons->getIconFile();
         $mapIcons->setIconFile(null);
         $entityManager->flush();
-        $files = glob($this->getParameter('map_icon_directory') . $fileName);
+        $files = glob($this->getParameter('business_contacts_map_icon_directory') . $fileName);
         foreach ($files as $file) {
             unlink($file);
         }
@@ -157,6 +161,7 @@ class MapIconsController extends AbstractController
         $concatenatedNotes = "Exported on: " . $exported_date_formatted;
         foreach ($map_icons_list as $map_icon) {
             $data[] = [
+                'MapIcons',
                 $map_icon->getName(),
                 $map_icon->getIconFile(),
             ];
@@ -164,8 +169,9 @@ class MapIconsController extends AbstractController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Map Icons');
-        $sheet->getCell('A1')->setValue('Name');
-        $sheet->getCell('B1')->setValue('FileName');
+        $sheet->getCell('A1')->setValue('Entity');
+        $sheet->getCell('B1')->setValue('Name');
+        $sheet->getCell('C1')->setValue('FileName');
 
         $sheet->fromArray($data, null, 'A2', true);
         $total_rows = $sheet->getHighestRow();
@@ -187,7 +193,7 @@ class MapIconsController extends AbstractController
     /**
      * @Route ("/import", name="map_icons_import" )
      */
-    public function mapIconsImport(Request $request, SluggerInterface $slugger, MapIconsRepository $mapIconsRepository, MapIconsImportService $mapIconsImportService): Response
+    public function mapIconsImport(Request $request, SluggerInterface $slugger, MapIconsRepository $mapIconsRepository, ImportMapIconsService $mapIconsImportService): Response
     {
         $form = $this->createForm(ImportType::class);
         $form->handleRequest($request);

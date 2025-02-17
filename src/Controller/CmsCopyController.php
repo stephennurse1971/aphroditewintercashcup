@@ -4,21 +4,43 @@ namespace App\Controller;
 
 use App\Entity\CmsCopy;
 use App\Form\CmsCopyType;
+use App\Form\ImportType;
 use App\Repository\CmsCopyRepository;
+use App\Repository\CompanyDetailsRepository;
+use App\Repository\PhotoLocationsRepository;
 use App\Repository\ProductRepository;
+use App\Services\ImportCMSCopyService;
+use App\Services\ImportCompanyDetailsService;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @Route("/cmscopy")
+ * @Security("is_granted('ROLE_ADMIN')")
  */
 class CmsCopyController extends AbstractController
 {
+    private EntityManagerInterface $entityManager;
+    private CmsCopyRepository $cmsCopyRepository;
+
+    public function __construct(EntityManagerInterface $entityManager, PhotoLocationsRepository $photoLocationsRepository)
+    {
+        $this->entityManager = $entityManager;
+        $this->photoLocationsRepository = $photoLocationsRepository;
+    }
+
+
     /**
      * @Route("/index", name="cms_copy_index", methods={"GET"})
      */
@@ -60,13 +82,13 @@ class CmsCopyController extends AbstractController
                     die('Import failed');
                 }
             }
-            if($cmsCopy->getCategory()=="ProductService"){
+            if ($cmsCopy->getCategory() == "ProductService") {
                 $cmsCopy->setStaticPageName(null);
             }
-            if($cmsCopy->getCategory()=="Static"){
+            if ($cmsCopy->getCategory() == "Static") {
                 $cmsCopy->setProduct(null);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($cmsCopy);
             $entityManager->flush();
             return $this->redirectToRoute('cms_copy_index');
@@ -95,7 +117,7 @@ class CmsCopyController extends AbstractController
     {
         $form = $this->createForm(CmsCopyType::class, $cmsCopy);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() ) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $attachment = $form->get('attachment')->getData();
             if ($attachment) {
                 $originalFilename = pathinfo($attachment->getClientOriginalName(), PATHINFO_FILENAME);
@@ -110,13 +132,13 @@ class CmsCopyController extends AbstractController
                     die('Import failed');
                 }
             }
-            if($cmsCopy->getCategory()=="ProductService"){
+            if ($cmsCopy->getCategory() == "ProductService") {
                 $cmsCopy->setStaticPageName(null);
             }
-            if($cmsCopy->getCategory()=="Static"){
+            if ($cmsCopy->getCategory() == "Static") {
                 $cmsCopy->setProduct(null);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($cmsCopy);
             $entityManager->flush();
             return $this->redirectToRoute('cms_copy_index');
@@ -131,7 +153,7 @@ class CmsCopyController extends AbstractController
     /**
      * @Route("/copy_and_edit/{id}", name="cms_copy_copy_and_edit", methods={"GET","POST"})
      */
-    public function copyAndEdit(Request $request, CmsCopy $cmsCopy, EntityManagerInterface $manager): Response
+    public function copyAndEdit(Request $request, CmsCopy $cmsCopy, EntityManagerInterface $entityManager): Response
     {
         $product = $cmsCopy->getProduct();
         $sitePage = 'Test';
@@ -147,7 +169,7 @@ class CmsCopyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($cmsCopy);
             $entityManager->flush();
             return $this->redirectToRoute('cms_copy_index');
@@ -164,10 +186,10 @@ class CmsCopyController extends AbstractController
     /**
      * @Route("/delete/{id}", name="cms_copy_delete", methods={"POST"})
      */
-    public function delete(Request $request, CmsCopy $cmsCopy): Response
+    public function delete(Request $request, CmsCopy $cmsCopy, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $cmsCopy->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->remove($cmsCopy);
             $entityManager->flush();
         }
@@ -202,8 +224,8 @@ class CmsCopyController extends AbstractController
     {
         $referer = $request->headers->get('referer');
         $fileName = $cmsCopy->getAttachment();
-        $file = $this->getParameter('cms_copy_attachments_directory') .$fileName;
-        if(file_exists($file)){
+        $file = $this->getParameter('cms_copy_attachments_directory') . $fileName;
+        if (file_exists($file)) {
             unlink($file);
         }
         $cmsCopy->setAttachment(null);
@@ -233,6 +255,132 @@ class CmsCopyController extends AbstractController
         return $this->redirect($referer);
     }
 
+
+    /**
+     * @Route("/cms_copy_reset_counters", name="cms_copy_reset_counters",)
+     */
+    public function resetCounters(Request $request, CmsCopyRepository $cmsCopyRepository, EntityManagerInterface $entityManager): Response
+    {
+        $referer = $request->server->get('HTTP_REFERER');
+        $cms_copys = $cmsCopyRepository->findAll();
+
+        foreach ($cms_copys as $cms_copy) {
+            $cms_copy->setPageCountAdmin(null);
+            $cms_copy->setPageCountUsers(null);
+            $entityManager->flush();
+        }
+        return $this->redirect($referer);
+    }
+
+
+
+
+
+    /**
+     * @Route ("/export", name="cms_copy_export")
+     */
+    public function cmsCopyExport(CmsCopyRepository $cmsCopyRepository)
+    {
+        $exportedDate = new \DateTime('now');
+        $exportedDateFormatted = $exportedDate->format('d-M-Y');
+        $fileName = 'cms_copy_export_' . $exportedDateFormatted . '.csv';
+
+        $cmsCopyList = $cmsCopyRepository->findAll();
+        $data = [];
+        $data[] = [ // Headers
+            'Entity', 'Category', 'Product', 'Ranking', 'Hyperlink', 'Attachment',
+            'PageCountUsers', 'PageCountAdmin', 'PageLayout', 'TabTitle', 'TabTitleFR',
+            'TabTitleDE', 'ContentTitle', 'ContentTitleFR', 'ContentTitleDE',
+            'ContentText', 'ContentTextFR', 'ContentTextDE',
+        ];
+
+        foreach ($cmsCopyList as $cmsCopy) {
+            $product = ($cmsCopy->getCategory() === 'Product or Service' && $cmsCopy->getProduct())
+                ? $cmsCopy->getProduct()->getProduct()
+                : 'NA';
+
+            $data[] = [
+                'CMSCopy',
+                $cmsCopy->getCategory(),
+                $product,
+                $cmsCopy->getRanking(),
+                $cmsCopy->getHyperlinks(),
+                $cmsCopy->getAttachment(),
+
+                $cmsCopy->getPageCountUsers(),
+                $cmsCopy->getPageCountAdmin(),
+                $cmsCopy->getPageLayout()->getName(),
+
+                $cmsCopy->getTabTitle(),
+                $cmsCopy->getTabTitleFR(),
+                $cmsCopy->getTabTitleDE(),
+
+                $cmsCopy->getContentTitle(),
+                $cmsCopy->getContentTitleFR(),
+                $cmsCopy->getContentTitleDE(),
+
+                $cmsCopy->getContentText(),
+                $cmsCopy->getContentTextFR(),
+                $cmsCopy->getContentTextDE(),
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($data, null, 'A1', true);
+
+        // Add hyperlink to a column (L)
+        $totalRows = $sheet->getHighestRow();
+        for ($i = 2; $i <= $totalRows; $i++) {
+            $cell = "L" . $i;
+            $sheet->getCell($cell)->getHyperlink()->setUrl("https://google.com");
+        }
+
+        $writer = new Csv($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileName
+        ));
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
+    }
+
+    /**
+     * @Route ("/import", name="cms_copy_import" )
+     */
+    public function productImport(Request $request, SluggerInterface $slugger, ImportCMSCopyService $importCMSCopyService): Response
+    {
+        $form = $this->createForm(ImportType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $importFile = $form->get('File')->getData();
+            if ($importFile) {
+                $originalFilename = pathinfo($importFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '.' . 'csv';
+                try {
+                    $importFile->move(
+                        $this->getParameter('cms_copy_import_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    die('Import failed');
+                }
+                $importCMSCopyService->importCMSCopy($newFilename);
+                return $this->redirectToRoute('cms_copy_index');
+            }
+        }
+        return $this->render('home/import.html.twig', [
+            'form' => $form->createView(),
+            'heading' => 'CMS Copy',
+        ]);
+    }
 
 
 }
